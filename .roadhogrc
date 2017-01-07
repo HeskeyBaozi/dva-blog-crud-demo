@@ -1,0 +1,32 @@
+{
+  "entry": "src/index.js",
+  "disableCSSModules": false,
+  "autoprefixer": null,
+  "proxy": null,
+  "extraBabelPlugins": [
+    "transform-runtime",
+    [
+      "import",
+      {
+        "libraryName": "antd",
+        "style": "css"
+      }
+    ]
+  ],
+  "env": {
+    "development": {
+      "extraBabelPlugins": [
+        "dva-hmr"
+      ]
+    }
+  },
+  "proxy": {
+    "/api": {
+      "target": "http://localhost:5858/api/v1",
+      "changeOrigin": true,
+      "pathRewrite": {
+        "^/api": ""
+      }
+    }
+  }
+}

@@ -1,0 +1,22 @@
+
+.normal {
+}
+
+.logo {
+    font-size: 2.2em;
+    margin: 0 0 10px 0;
+    text-align: center;
+}
+
+.container {
+    width: 480px;
+    height: min-content;
+}
+
+.toOther {
+    float: right;
+}
+
+.button {
+    width: 100%;
+}
