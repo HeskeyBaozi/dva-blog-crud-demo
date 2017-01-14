@@ -1,5 +1,5 @@
 module.exports = () => {
     return {
-        'primary-color':'#5f5f5f'
+        'primary-color':'#2979a2'
     };
 };

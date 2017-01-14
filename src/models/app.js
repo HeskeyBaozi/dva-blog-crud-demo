@@ -1,9 +1,9 @@
 'use strict';
 
-import {auth, verifyToken} from '../services/app';
+import {auth, fetchUser} from '../services/app';
 import {routerRedux} from 'dva/router';
 import {message} from 'antd';
-
+import {storageTokenKey} from '../utils/constant';
 
 export default {
     namespace: 'app',
@@ -14,83 +14,98 @@ export default {
             ability: null,
             user_id: null,
             email: null
-        },
-        token: null
+        }
     },
     subscriptions: {
         setup: function ({history, dispatch}) {
             history.listen(location => {
                 if (!['/login', '/register'].includes(location.pathname)) {
-                    dispatch({type: 'queryAuth'});
+                    dispatch({type: 'checkToken'});
                 }
             });
         }
     },
     effects: {
         auth: function *({payload}, {call, put}) {
-            const result = yield call(auth, payload);
+            const {username, password} = payload;
+            const {data} = yield call(auth, {username, password});
 
             // succeed to login
-            if (result.data) {
-                const {user, access_token} = result.data;
+            if (data) {
+                const {user, access_token} = data;
                 const {token} = access_token;
-                window.localStorage.setItem('blogDemoToken', token);
+
+                // save the token to the local storage.
+                window.localStorage.setItem(storageTokenKey, token);
                 yield put({
                     type: 'authSuccess',
-                    payload: {account: user, token}
+                    payload: {account: user}
                 });
-                yield put(routerRedux.push('/'));
-            } else {
-
-                // fail to login
-                message.error('Wrong UserName or Password. Please Try Again!', 3);
-                yield put({type: 'authFail', payload: result.err});
+                yield put(routerRedux.push('/posts'));
             }
         },
-        queryAuth: function*({payload}, {put, call, select}) {
-            const token = window.localStorage.getItem('blogDemoToken');
+        checkToken: function*({payload}, {put, call, select}) {
+
+            // get the token from local storage.
+            const token = window.localStorage.getItem(storageTokenKey);
             if (token) {
-                yield put({type: 'verifySuccess', payload: {token}});
+                yield put({type: 'hasToken'});
+                yield put({type: 'queryUser'});
             } else {
-                yield put({type: 'verifyFail'});
+                yield put({type: 'authFail'});
             }
-            const isLogin = yield select(state => state.app.isLogin);
-            if (!isLogin) {
-                yield put(routerRedux.push('/login'));
+        },
+        logout: function *({payload}, {put}) {
+            yield put({type: 'authFail'});
+            window.localStorage.removeItem(storageTokenKey);
+            yield put(routerRedux.push('/login'));
+            message.success('Log out successfully! :)');
+        },
+        queryUser: function *({payload}, {put, call}) {
+            const {data} = yield call(fetchUser);
+            if (data) {
+                yield put({
+                    type: 'queryUserSuccess',
+                    payload: {
+                        account: data
+                    }
+                })
             }
         }
     },
     reducers: {
         authSuccess: function (state, {payload}) {
-            const {account, token} = payload;
+            const {account} = payload;
             return {
                 ...state,
-                ...account,
-                token,
+                account,
                 isLogin: true
             };
         },
-        verifySuccess: function (state, {payload}) {
-            const {token} = payload;
+        hasToken: function (state) {
             return {
                 ...state,
-                token,
                 isLogin: true
-            }
+            };
+        },
+        queryUserSuccess: function (state, {payload}) {
+            const {account} = payload;
+            return {
+                ...state,
+                account
+            };
         },
         authFail: function (state) {
             return {
                 ...state,
-                token: null,
                 isLogin: false,
+                account: {
+                    username: null,
+                    ability: null,
+                    user_id: null,
+                    email: null
+                }
             };
-        },
-        verifyFail: function (state) {
-            return {
-                ...state,
-                token: null,
-                isLogin: false
-            }
         }
     }
 

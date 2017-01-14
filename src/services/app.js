@@ -1,6 +1,7 @@
 'use strict';
 
 import request from '../utils/request';
+import {storageTokenKey} from '../utils/constant';
 import {stringify} from 'qs';
 
 export function auth(payload) {
@@ -16,8 +17,10 @@ export function auth(payload) {
     });
 }
 
-export function verifyToken({token}) {
-    return request('/api/token', {
+
+export function fetchUser() {
+    const token = window.localStorage.getItem(storageTokenKey);
+    return request('/api/user', {
         method: 'get',
         headers: new Headers({
             "Authorization": `Bearer ${token}`

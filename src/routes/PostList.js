@@ -1,5 +1,6 @@
 import React from 'react';
 import {connect} from 'dva';
+import {Link} from 'dva/router';
 import styles from './PostList.css';
 import {Table, Card} from 'antd';
 import moment from 'moment';
@@ -9,31 +10,30 @@ const {Column} = Table;
 function PostList({
     dispatch,
     postsList,
-    paging
+    paging,
+    loading
 }) {
     const columnProps = {
         title: 'posts',
         key: 'posts',
         render: (text, record, index) => {
-            return (<Card>
-                <div className={styles.cardContent}>
-                    <span className={styles.commentNumber}>
-                    {record.descendants.length}
-                </span>
-                    <span>
-                    <h3>{record.title}</h3>
-                    <p>
-                        By <em>{record.author_id}</em> | {moment.unix(record.created_at).fromNow()}
-                    </p>
-                </span>
-                </div>
-            </Card>);
+            return (<Link to={`/posts/${record.post_id}`}>
+                <Card>
+                    <div className={styles.cardContent}>
+                        <span className={styles.commentNumber}>{record.descendants.length}</span>
+                        <span>
+                            <h3>{record.title}</h3>
+                            <p>By <em>{record.author_id}</em> | {moment.unix(record.created_at).fromNow()}</p>
+                        </span>
+                    </div>
+                </Card>
+            </Link>);
         }
     };
 
     const pagination = {
         total: paging.total,
-        pageSize:paging.per_page,
+        pageSize: paging.per_page,
         showSizeChanger: true,
         pageSizeOptions: ['5', '10'],
         showQuickJumper: true,
@@ -47,6 +47,17 @@ function PostList({
                     }
                 }
             });
+        },
+        onShowSizeChange: (current, size) => {
+            dispatch({
+                type: 'posts/queryPosts',
+                payload: {
+                    pageInfo: {
+                        limit: size,
+                        page: current
+                    }
+                }
+            });
         }
     };
 
@@ -54,7 +65,8 @@ function PostList({
         dataSource: postsList,
         showHeader: false,
         rowKey: 'post_id',
-        pagination
+        pagination,
+        loading
     };
 
     return (
@@ -68,7 +80,8 @@ function PostList({
 
 function mapStateToProps(state) {
     return {
-        ...state.posts
+        ...state.posts,
+        loading: state.loading.models.posts,
     };
 }
 

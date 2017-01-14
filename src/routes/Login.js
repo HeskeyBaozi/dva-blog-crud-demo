@@ -17,7 +17,8 @@ const Login = Form.create({})(({
     }
 }) => {
     function commit(data) {
-        dispatch({type: 'app/auth', payload: data});
+        const {username, password} = data;
+        dispatch({type: 'app/auth', payload: {username, password}});
     }
 
 

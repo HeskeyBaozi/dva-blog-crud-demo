@@ -1,5 +1,5 @@
 import {fetchPosts} from '../services/posts';
-
+import {storageTokenKey} from '../utils/constant';
 
 export default {
     namespace: 'posts',
@@ -27,8 +27,8 @@ export default {
     effects: {
         queryPosts: function *({payload}, {call, put, select}) {
             const {pageInfo} = payload;
-            const {data, err} = yield call(fetchPosts, {
-                token: yield select(state => state.app.token),
+            const {data} = yield call(fetchPosts, {
+                token: window.localStorage.getItem(storageTokenKey),
                 pageInfo
             });
 
