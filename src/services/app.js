@@ -15,3 +15,12 @@ export function auth(payload) {
         })
     });
 }
+
+export function verifyToken({token}) {
+    return request('/api/token', {
+        method: 'get',
+        headers: new Headers({
+            "Authorization": `Bearer ${token}`
+        })
+    });
+}

@@ -3,7 +3,7 @@ import styles from './Register.css';
 import {Link} from 'dva/router';
 import LoginLayout from '../components/LoginLayout/LoginLayout';
 
-import {Form, Input, Button} from 'antd';
+import {Form, Input, Button, Icon} from 'antd';
 
 const FormItem = Form.Item;
 
@@ -71,7 +71,7 @@ const Register = Form.create()(({form}) => {
                                         message: 'Please input your username!'
                                     }
                                 ],
-                            })(<Input />)
+                            })(<Input addonBefore={<Icon type="user"/>}/>)
                         }
                     </FormItem>
                     <FormItem
@@ -91,7 +91,7 @@ const Register = Form.create()(({form}) => {
                                         message: 'Please input your E-mail!',
                                     }
                                 ],
-                            })(<Input />)
+                            })(<Input addonBefore={<Icon type="mail"/>}/>)
                         }
                     </FormItem>
                     <FormItem
@@ -110,7 +110,7 @@ const Register = Form.create()(({form}) => {
                                         validator: checkConfirm,
                                     }
                                 ],
-                            })(<Input type="password" onBlur={handlePasswordBlue}/>)
+                            })(<Input type="password" onBlur={handlePasswordBlue} addonBefore={<Icon type="lock"/>}/>)
                         }
                     </FormItem>
                     <FormItem
@@ -125,7 +125,7 @@ const Register = Form.create()(({form}) => {
                                 }, {
                                     validator: checkPassword,
                                 }],
-                            })(<Input type="password"/>)
+                            })(<Input type="password" addonBefore={<Icon type="lock"/>}/>)
                         }
                     </FormItem>
                     <FormItem {...tailFormItemLayout}>

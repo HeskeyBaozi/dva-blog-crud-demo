@@ -2,7 +2,6 @@
 
 import React, {PropTypes} from 'react';
 import {connect} from 'dva';
-import Login from './Login';
 import MainLayout from '../components/MainLayout/MainLayout';
 
 const App = ({
@@ -10,21 +9,20 @@ const App = ({
     location,
     dispatch,
     loading,
+    routes,
+    params,
     app
 }) => {
     const {isLogin} = app;
 
-    const LoginProps = {
-        loading,
-        commit: data => dispatch({type: 'app/auth', payload: data})
+    const mainLayoutProps = {
+        routes,
+        params
     };
 
     return (
         <div>
-            {isLogin
-                ? <MainLayout/>
-                : <Login {...LoginProps}/>
-            }
+            {isLogin ? <MainLayout {...mainLayoutProps}>{children}</MainLayout> : null}
         </div>
     );
 };
@@ -35,9 +33,10 @@ App.propTypes = {
     dispatch: PropTypes.func
 };
 
+
 export default connect((state, ownProps) => {
     return {
         loading: state.loading.models.app,
         app: state.app
     };
-})(App)
+})(App);

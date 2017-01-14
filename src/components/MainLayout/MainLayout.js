@@ -1,74 +1,44 @@
 'use strict';
 
 import React from 'react';
-import {Layout, Menu, Breadcrumb, Icon} from 'antd';
+import {Layout, Menu, Breadcrumb} from 'antd';
+const {Header, Content, Footer} = Layout;
+
+import LogoImg from '../../assets/dog_48px_1182381_easyicon.net.png';
 import styles from './MainLayout.css';
 
-const {Header, Content, Footer, Sider} = Layout;
-const MenuItem = Menu.Item;
+
+const MainLayout = props => {
+
+    const {routes, params} = props;
+    const menuProps = {
+        theme: 'light',
+        mode: 'horizontal',
+        defaultSelectedKeys: ['1'],
+    };
 
 
-class MainLayout extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            collapsed: false
-        };
-        this.onCollapse = collapsed => {
-            this.setState({collapsed});
-        };
-    }
-
-
-    render() {
-        const siderProps = {
-            collapsible: true,
-            collapsed: this.state.collapsed,
-            onCollapse: this.onCollapse
-        };
-
-        const menuProps = {
-            theme: 'dark',
-            mode: 'inline',
-            defaultSelectedKeys: ['1']
-        };
-
-        return (
-            <Layout>
-                <Sider {...siderProps}>
-                    <div>LOGO</div>
-                    <Menu {...menuProps}>
-                        <MenuItem key="1">
-                            <Icon type="user"/>
-                            <span>nav 1</span>
-                        </MenuItem>
-                        <MenuItem key="2">
-                            <Icon type="heart-o"/>
-                            <span>nav 2</span>
-                        </MenuItem>
-                    </Menu>
-                </Sider>
-                <Layout>
-                    <Header>
-                        header
-                    </Header>
-                    <Content>
-                        <Breadcrumb>
-                            <Breadcrumb.Item>Home</Breadcrumb.Item>
-                            <Breadcrumb.Item>List</Breadcrumb.Item>
-                            <Breadcrumb.Item>App</Breadcrumb.Item>
-                        </Breadcrumb>
-                        <div>
-                            {this.props.children}
-                        </div>
-                    </Content>
-                    <Footer>
-                        Heskey Baozi
-                    </Footer>
-                </Layout>
-            </Layout>
-        );
-    }
-}
+    return (
+        <Layout className="layout">
+            <Header className={styles.header}>
+                <div className={styles.logo}>
+                    <img src={LogoImg} alt="my blog!"/>
+                </div>
+                <Menu {...menuProps} className={styles.menu}>
+                    <Menu.Item key="1">Posts</Menu.Item>
+                </Menu>
+            </Header>
+            <Content style={{padding: '0 50px'}}>
+                <Breadcrumb routes={routes} params={params} style={{margin: '12px 0'}}/>
+                <div style={{background: '#fff', padding: 24, minHeight: 280}}>
+                    {props.children}
+                </div>
+            </Content>
+            <Footer style={{textAlign: 'center'}}>
+                Ant Design ©2016 Created by Ant UED
+            </Footer>
+        </Layout>
+    )
+};
 
 export default MainLayout;

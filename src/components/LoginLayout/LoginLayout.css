@@ -9,7 +9,7 @@
 }
 
 .background {
-  background: #222 url('../../assets/miku.jpg') 0/cover fixed;
+  background: #222 url('../../assets/simple.jpg') 0/cover fixed;
   position: fixed;
   left: 0;
   top: 0;
@@ -25,7 +25,7 @@
   border-radius: 3px;
   z-index: 1;
   flex: 0 1 auto;
-  box-shadow: 0 1px gray;
+  box-shadow: 0 0 100px rgba(0,0,0,.08);
 }
 
 .footer {

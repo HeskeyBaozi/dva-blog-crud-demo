@@ -1,19 +1,26 @@
 import React from 'react';
 import styles from './Login.css';
 import {Link} from 'dva/router';
+import {connect} from 'dva';
 import LoginLayout from '../components/LoginLayout/LoginLayout';
 import {Form, Icon, Input, Button, Checkbox} from 'antd';
+import blogLogo from '../assets/dog_48px_1182381_easyicon.net.png';
 
 
 const FormItem = Form.Item;
-const Login = (({
+const Login = Form.create({})(({
     loading,
-    commit,
+    dispatch,
     form:{
         getFieldDecorator,
         validateFields
     }
 }) => {
+    function commit(data) {
+        dispatch({type: 'app/auth', payload: data});
+    }
+
+
     function handleSubmit(e) {
         e.preventDefault();
         validateFields((error, values) => {
@@ -32,7 +39,10 @@ const Login = (({
     return (
         <LoginLayout>
             <div className={styles.container}>
-                <div className={styles.logo}>My Blog!</div>
+                <div className={styles.logo}>
+                    <img className={styles.logoImg} src={blogLogo} alt="my blog"/>
+                    <span>My Blog!</span>
+                </div>
                 <Form onSubmit={handleSubmit}>
                     <FormItem>
                         {
@@ -81,4 +91,8 @@ const Login = (({
     );
 });
 
-export default Form.create()(Login);
+export default connect((state, ownProps) => {
+    return {
+        loading: state.loading.models.app,
+    };
+})(Login);
