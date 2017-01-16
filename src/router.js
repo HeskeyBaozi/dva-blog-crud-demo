@@ -18,7 +18,7 @@ function RouterConfig({history, app}) {
                 <Route path="posts/:post_id" breadcrumbName="Post - :post_id" component={props => <h1>detail</h1>}/>
                 <Route path="*" breadcrumbName="Not Found" component={props => <h1>Oops! Not Found</h1>}/>
             </Route>
-            <Route path="/PostPage" component={PostPage} />
+            <Route path="/PostPage" component={PostPage}/>
         </Router>
     );
 }

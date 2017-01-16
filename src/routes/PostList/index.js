@@ -1,7 +1,7 @@
 import React from 'react';
 import {connect} from 'dva';
 import {Link} from 'dva/router';
-import styles from './PostList.css';
+import styles from './index.css';
 import {Table, Card} from 'antd';
 import moment from 'moment';
 

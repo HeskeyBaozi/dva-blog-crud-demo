@@ -1,7 +1,7 @@
 import React from 'react';
-import styles from './Register.css';
+import styles from './index.css';
 import {Link} from 'dva/router';
-import LoginLayout from '../components/LoginLayout/LoginLayout';
+import LoginLayout from '../../components/LoginLayout/LoginLayout';
 
 import {Form, Input, Button, Icon} from 'antd';
 
