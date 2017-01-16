@@ -8,9 +8,8 @@ import './index.less';
 // 1. Initialize
 const app = dva({
     onError(e, dispatch) {
-        dispatch(routerRedux.push('/login'));
-        message.error(e.message, /* duration */5);
-        throw e;
+        dispatch({type: 'app/logout'});
+        message.error(e.message, 5);
     }
 });
 

@@ -2,7 +2,6 @@
 
 import {auth, fetchUser} from '../services/app';
 import {routerRedux} from 'dva/router';
-import {message} from 'antd';
 import {storageTokenKey} from '../utils/constant';
 
 export default {
@@ -26,6 +25,12 @@ export default {
         }
     },
     effects: {
+        /**
+         * fetch token and save in local storage.
+         * @param payload
+         * @param call
+         * @param put
+         */
         auth: function *({payload}, {call, put}) {
             const {username, password} = payload;
             const {data} = yield call(auth, {username, password});
@@ -44,8 +49,14 @@ export default {
                 yield put(routerRedux.push('/posts'));
             }
         },
+        /**
+         * check the local storage whether has token
+         * @param payload
+         * @param put
+         * @param call
+         * @param select
+         */
         checkToken: function*({payload}, {put, call, select}) {
-
             // get the token from local storage.
             const token = window.localStorage.getItem(storageTokenKey);
             if (token) {
@@ -55,12 +66,22 @@ export default {
                 yield put({type: 'authFail'});
             }
         },
+        /**
+         * log out and remove the token
+         * @param payload
+         * @param put
+         */
         logout: function *({payload}, {put}) {
             yield put({type: 'authFail'});
             window.localStorage.removeItem(storageTokenKey);
             yield put(routerRedux.push('/login'));
-            message.success('Log out successfully! :)');
         },
+        /**
+         * fetch user information according the token.
+         * @param payload
+         * @param put
+         * @param call
+         */
         queryUser: function *({payload}, {put, call}) {
             const {data} = yield call(fetchUser);
             if (data) {

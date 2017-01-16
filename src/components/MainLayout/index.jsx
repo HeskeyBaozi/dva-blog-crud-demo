@@ -1,9 +1,8 @@
-'use strict';
-
 import React, {PropTypes} from 'react';
-import {Layout, Menu, Breadcrumb, Button} from 'antd';
+import {Layout, Menu, Breadcrumb, Card} from 'antd';
 import LogoImg from '../../assets/dog_48px_1182381_easyicon.net.png';
-import styles from './MainLayout.less';
+import styles from './index.less';
+import UserInfo from './UserInfo';
 const {Header, Content, Footer} = Layout;
 
 const MainLayout = ({
@@ -15,7 +14,6 @@ const MainLayout = ({
 }) => {
 
     const menuProps = {
-        theme: 'light',
         mode: 'horizontal',
         defaultSelectedKeys: ['1'],
     };
@@ -24,18 +22,21 @@ const MainLayout = ({
         routes,
         params
     };
+
+    const userInfoProps = {
+        account,
+        handleClickLogOut
+    };
     return (
-        <Layout>
+        <Layout className={styles.layoutContainer}>
             <Header className={styles.header}>
                 <div className={styles.logo}>
                     <img src={LogoImg} alt="my blog!"/>
                 </div>
-                <div className={styles.user}>
-                    <span>Hello, {account.ability === 'super' ? 'Super' : 'Normal'}<em>{account.username}</em></span>
-                    <Button type="ghost" icon="logout" onClick={handleClickLogOut}>Logout</Button>
-                </div>
+                <UserInfo {...userInfoProps}/>
                 <Menu {...menuProps} className={styles.menu}>
                     <Menu.Item key="1">Posts</Menu.Item>
+                    <Menu.Item key="2">User</Menu.Item>
                 </Menu>
             </Header>
             <Content className={styles.content}>
