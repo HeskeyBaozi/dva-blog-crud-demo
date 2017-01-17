@@ -33,3 +33,18 @@ export function fetchComments({post_id}) {
         })
     });
 }
+
+export function createComment({post_id, commentInput}) {
+    const token = window.localStorage.getItem(storageTokenKey);
+    return request(`/api/comments?${stringify({post_id})}`, {
+        method: 'post',
+        headers: new Headers({
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/x-www-form-urlencoded; charset=utf-8"
+        }),
+        body: stringify({
+            post_id,
+            content: commentInput
+        })
+    });
+}

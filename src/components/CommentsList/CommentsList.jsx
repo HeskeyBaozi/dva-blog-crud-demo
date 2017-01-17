@@ -1,5 +1,5 @@
 import React, {PropTypes} from 'react';
-import {Table, Card, Icon} from 'antd';
+import {Table, Icon, Button, Popconfirm} from 'antd';
 import Publish from '../CommentsPublish/CommentsPublish';
 import styles from './CommentsList.css';
 import moment from 'moment';
@@ -8,7 +8,8 @@ const {Column} = Table;
 function CommentsList({
     descendants,
     loading,
-    publishComment
+    publishComment,
+    user_id
 }) {
 
     const columnProps = {
@@ -21,11 +22,29 @@ function CommentsList({
                 created_at,
                 visible
             } = record;
-            console.log('record = ', record);
+
+            const popConfirmProps = {
+                title: 'Are you sure to delete this comment?',
+                okText: 'Yes, sure',
+                cancelText: 'Cancel'
+            };
+
+            console.log(author);
             return (
                 <div>
-                    <p>{visible ? content : 'can not see'}</p>
-                    <p>By <em>{author.username}</em>, {moment(created_at).fromNow()}</p>
+                    <div className={styles.content}>{visible ? content : 'can not see'}</div>
+                    <p className={styles.meta}>
+                        By <em>{author.username}</em>, {moment(created_at).fromNow()}
+                    </p>
+                    {
+                        user_id === author.user_id ?
+                            <Button.Group className={styles.panel}>
+                                <Button size="small" type="ghost" icon="edit">Edit</Button>
+                                <Popconfirm {...popConfirmProps}>
+                                    <Button size="small" type="ghost" icon="delete">Delete</Button>
+                                </Popconfirm>
+                            </Button.Group> : null
+                    }
                 </div>
             );
         }
@@ -62,7 +81,8 @@ function CommentsList({
 CommentsList.propTypes = {
     descendants: PropTypes.array.isRequired,
     loading: PropTypes.bool.isRequired,
-    publishComment: PropTypes.func.isRequired
+    publishComment: PropTypes.func.isRequired,
+    user_id: PropTypes.string.isRequired
 };
 
 export default CommentsList;

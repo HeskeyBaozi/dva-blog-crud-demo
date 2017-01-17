@@ -9,7 +9,8 @@ import CommentsList from '../../components/CommentsList/CommentsList';
 function PostPage({
     currentPost,
     loading,
-    dispatch
+    dispatch,
+    account
 }) {
     const {
         title,
@@ -21,6 +22,8 @@ function PostPage({
         post_id
     } = currentPost;
 
+    const {user_id} = account;
+
     const postContentProps = {
         loading: loading.content,
         visible,
@@ -30,11 +33,12 @@ function PostPage({
     const commentsListProps = {
         loading: loading.comments,
         descendants,
-        publishComment
+        publishComment,
+        user_id
     };
 
     function publishComment({commentInput}) {
-        dispatch({type: 'posts/createNewComment', payload: {commentInput}});
+        dispatch({type: 'posts/createNewComment', payload: {commentInput, post_id}});
     }
 
     return (
@@ -50,7 +54,8 @@ function PostPage({
 PostPage.propTypes = {
     currentPost: PropTypes.object.isRequired,
     loading: PropTypes.object.isRequired,
-    dispatch: PropTypes.func.isRequired
+    dispatch: PropTypes.func.isRequired,
+    account: PropTypes.object.isRequired
 };
 
 function mapStateToProps(state, ownProps) {
@@ -60,7 +65,8 @@ function mapStateToProps(state, ownProps) {
         loading: {
             content: state.loading.effects['posts/fetchPostContent'],
             comments: state.loading.effects['posts/fetchPostComments']
-        }
+        },
+        account: state.app.account
     };
 }
 

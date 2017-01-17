@@ -2,7 +2,7 @@
 
 import React from 'react';
 import {Layout} from 'antd';
-import styles from './LoginLayout.css';
+import styles from './LoginLayout.less';
 const {Content, Footer} = Layout;
 
 function LoginLayout(props) {

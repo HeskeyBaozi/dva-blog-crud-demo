@@ -1,4 +1,4 @@
-import {fetchPosts, fetchContent, fetchComments} from '../services/posts';
+import {fetchPosts, fetchContent, fetchComments, createComment} from '../services/posts';
 import pathToRegExp from 'path-to-regexp';
 
 export default {
@@ -74,9 +74,15 @@ export default {
                 });
             }
         },
-        createNewComment: function ({payload}, {call, put, select}) {
-            const {commentInput} = payload;
-            console.log(commentInput);
+        createNewComment: function*({payload}, {call, put}) {
+            const {commentInput, post_id} = payload;
+            const {data:newComment} = yield call(createComment, {post_id, commentInput});
+            if (newComment) {
+                yield put({
+                    type: 'pushNewComment',
+                    payload: {newComment, post_id}
+                });
+            }
         }
     },
     reducers: {
@@ -115,6 +121,21 @@ export default {
                         ...state.postsById[post_id],
                         descendants
                     }
+                }
+            };
+        },
+        pushNewComment: function (state, {payload}) {
+            const {newComment, post_id} = payload;
+            const currentPost = state.postsById[post_id];
+            return {
+                ...state,
+                postsById: {
+                    ...state.postsById,
+                    [post_id]: {
+                        ...currentPost,
+                        descendants: [...currentPost.descendants, newComment]
+                    }
+
                 }
             };
         }

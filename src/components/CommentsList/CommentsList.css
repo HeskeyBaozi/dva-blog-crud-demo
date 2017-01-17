@@ -2,3 +2,14 @@
     margin-right: 5px;
 }
 
+.meta {
+    float: left;
+}
+
+.panel {
+    float: right;
+}
+
+.content {
+    margin: 5px 0;
+}

@@ -39,7 +39,7 @@ function CommentsPublish({
         <Form {...formProps}>
             <Form.Item>
                 {
-                    getFieldDecorator('content', {
+                    getFieldDecorator('commentInput', {
                         rules: [
                             {
                                 required: true,
