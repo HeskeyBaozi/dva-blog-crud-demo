@@ -8,7 +8,8 @@ import CommentsList from '../../components/CommentsList/CommentsList';
 
 function PostPage({
     currentPost,
-    loading
+    loading,
+    dispatch
 }) {
     const {
         title,
@@ -16,40 +17,50 @@ function PostPage({
         content,
         visible,
         created_at,
-        descendants
+        descendants,
+        post_id
     } = currentPost;
 
     const postContentProps = {
+        loading: loading.content,
         visible,
         content
     };
 
     const commentsListProps = {
-        loading,
-        descendants
+        loading: loading.comments,
+        descendants,
+        publishComment
     };
 
+    function publishComment({commentInput}) {
+        dispatch({type: 'posts/createNewComment', payload: {commentInput}});
+    }
+
     return (
-        <Spin spinning={loading} className={styles.normal}>
-            <div className={styles.postMeta}>
-                <h1 className={styles.title}>{title}</h1>
-                <p className={styles.leading}>By <em>{author.username}</em>, {moment(created_at).fromNow()}</p>
-            </div>
+        <div>
+            <h1 className={styles.title}>{title}</h1>
+            <p className={styles.leading}>By <em>{author.username}</em>, {moment(created_at).fromNow()}</p>
             <PostContent {...postContentProps}/>
             <CommentsList {...commentsListProps}/>
-        </Spin>
+        </div>
     );
 }
 
 PostPage.propTypes = {
-    currentPost: PropTypes.object.isRequired
+    currentPost: PropTypes.object.isRequired,
+    loading: PropTypes.object.isRequired,
+    dispatch: PropTypes.func.isRequired
 };
 
 function mapStateToProps(state, ownProps) {
     const post_id = ownProps.params.post_id;
     return {
         currentPost: state.posts.postsById[post_id],
-        loading: state.loading.models.posts
+        loading: {
+            content: state.loading.effects['posts/fetchPostContent'],
+            comments: state.loading.effects['posts/fetchPostComments']
+        }
     };
 }
 

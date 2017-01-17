@@ -18,7 +18,7 @@ const UserInfo = ({
                 <span>Hello, <em className={styles.username}>{username} !</em>
             </span>
             </Tooltip>
-            <Button icon="logout" onClick={handleClickLogOut}>Logout!</Button>
+            <Button icon="logout" type="primary" onClick={handleClickLogOut}>Logout!</Button>
         </div>
     );
 };

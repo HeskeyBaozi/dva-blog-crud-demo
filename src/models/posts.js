@@ -1,4 +1,4 @@
-import {fetchPosts, fetchContent} from '../services/posts';
+import {fetchPosts, fetchContent, fetchComments} from '../services/posts';
 import pathToRegExp from 'path-to-regexp';
 
 export default {
@@ -30,6 +30,11 @@ export default {
                         type: 'fetchPostContent',
                         payload: {post_id}
                     });
+
+                    dispatch({
+                        type: 'fetchPostComments',
+                        payload: {post_id}
+                    });
                 }
             });
         }
@@ -57,6 +62,21 @@ export default {
                     payload: {content, post_id}
                 });
             }
+        },
+        fetchPostComments: function*({payload}, {call, put}) {
+            const {post_id} = payload;
+            const {data} = yield call(fetchComments, {post_id});
+            if (data) {
+                const {descendants} = data;
+                yield put({
+                    type: 'saveComments',
+                    payload: {descendants, post_id}
+                });
+            }
+        },
+        createNewComment: function ({payload}, {call, put, select}) {
+            const {commentInput} = payload;
+            console.log(commentInput);
         }
     },
     reducers: {
@@ -79,8 +99,24 @@ export default {
             const {content, post_id} = payload;
             return {
                 ...state,
-                postsById: {...state.postsById, [post_id]: {...state.postsById[post_id], content}}
-            }
+                postsById: {
+                    ...state.postsById,
+                    [post_id]: {...state.postsById[post_id], content}
+                }
+            };
+        },
+        saveComments: function (state, {payload}) {
+            const {descendants, post_id} = payload;
+            return {
+                ...state,
+                postsById: {
+                    ...state.postsById,
+                    [post_id]: {
+                        ...state.postsById[post_id],
+                        descendants
+                    }
+                }
+            };
         }
     }
 }

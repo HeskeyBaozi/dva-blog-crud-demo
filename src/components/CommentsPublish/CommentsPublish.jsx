@@ -1,5 +1,6 @@
 import React, {PropTypes} from 'react';
 import {Form, Input, Button, Row, Col} from 'antd';
+import styles from './CommentsPublish.css';
 
 function CommentsPublish({
     loading,
@@ -7,27 +8,29 @@ function CommentsPublish({
         getFieldDecorator,
         validateFieldsAndScroll,
         resetFields
-    }
+    },
+    commit
 }) {
 
     const formProps = {
-        onSubmit: handlePublish
+        onSubmit: handlePublish,
+        className:styles.form
     };
     const buttonProps = {
         loading,
         type: 'primary',
         size: 'large',
-        icon: 'message',
-        style: {float: 'right'},
+        icon: 'plus-square-o',
+        className:styles.button,
         htmlType: 'submit'
     };
 
     function handlePublish(e) {
         e.preventDefault();
-        validateFieldsAndScroll((error, values) => {
+        validateFieldsAndScroll((error, {commentInput}) => {
             if (!error) {
                 resetFields();
-                console.log('Received values of form: ', values);
+                commit({commentInput});
             }
         });
     }
@@ -36,7 +39,7 @@ function CommentsPublish({
         <Form {...formProps}>
             <Form.Item>
                 {
-                    getFieldDecorator('commentInput', {
+                    getFieldDecorator('content', {
                         rules: [
                             {
                                 required: true,
@@ -54,12 +57,13 @@ function CommentsPublish({
                 </Row>
             </Form.Item>
         </Form>
-    )
+    );
 }
 
 CommentsPublish.propTypes = {
     form: PropTypes.object.isRequired,
-    loading: PropTypes.bool.isRequired
+    loading: PropTypes.bool.isRequired,
+    commit: PropTypes.func.isRequired
 };
 
 export default Form.create({})(CommentsPublish);

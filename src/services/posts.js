@@ -23,3 +23,13 @@ export function fetchContent({post_id}) {
         })
     });
 }
+
+export function fetchComments({post_id}) {
+    const token = window.localStorage.getItem(storageTokenKey);
+    return request(`/api/comments?${stringify({post_id})}`, {
+        method: 'get',
+        headers: new Headers({
+            "Authorization": `Bearer ${token}`
+        })
+    });
+}
