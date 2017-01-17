@@ -13,3 +13,13 @@ export function fetchPosts({pageInfo}) {
         })
     });
 }
+
+export function fetchContent({post_id}) {
+    const token = window.localStorage.getItem(storageTokenKey);
+    return request(`/api/posts/${post_id}/content`, {
+        method: 'get',
+        headers: new Headers({
+            "Authorization": `Bearer ${token}`
+        })
+    });
+}

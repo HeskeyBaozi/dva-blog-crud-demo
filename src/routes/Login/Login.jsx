@@ -1,21 +1,19 @@
 import React from 'react';
-import styles from './index.css';
+import styles from './Login.css';
 import {Link} from 'dva/router';
 import {connect} from 'dva';
 import LoginLayout from '../../components/LoginLayout/LoginLayout';
 import {Form, Icon, Input, Button, Checkbox} from 'antd';
 import blogLogo from '../../assets/dog_48px_1182381_easyicon.net.png';
 
-
-const FormItem = Form.Item;
-const Login = Form.create({})(({
+function Login({
     loading,
     dispatch,
     form:{
         getFieldDecorator,
         validateFields
     }
-}) => {
+}) {
     function commit(data) {
         const {username, password} = data;
         dispatch({type: 'app/auth', payload: {username, password}});
@@ -31,12 +29,6 @@ const Login = Form.create({})(({
         });
     }
 
-    document.onkeyup = e => {
-        if (e.keyCode === 13) {
-            handleSubmit(e);
-        }
-    };
-
     return (
         <LoginLayout>
             <div className={styles.container}>
@@ -45,7 +37,7 @@ const Login = Form.create({})(({
                     <span>My Blog!</span>
                 </div>
                 <Form onSubmit={handleSubmit}>
-                    <FormItem>
+                    <Form.Item>
                         {
                             getFieldDecorator('username', {
                                 rules: [
@@ -56,8 +48,8 @@ const Login = Form.create({})(({
                                 ]
                             })(<Input addonBefore={<Icon type="user"/>} placeholder="Username"/>)
                         }
-                    </FormItem>
-                    <FormItem>
+                    </Form.Item>
+                    <Form.Item>
                         {
                             getFieldDecorator('password', {
                                 rules: [
@@ -68,8 +60,8 @@ const Login = Form.create({})(({
                                 ]
                             })(<Input addonBefore={<Icon type="lock"/>} type="password" placeholder="Password"/>)
                         }
-                    </FormItem>
-                    <FormItem>
+                    </Form.Item>
+                    <Form.Item>
                         {
                             getFieldDecorator('remember', {
                                 valuePropName: 'checked',
@@ -85,15 +77,15 @@ const Login = Form.create({})(({
                         >
                             Log in
                         </Button>
-                    </FormItem>
+                    </Form.Item>
                 </Form>
             </div>
         </LoginLayout>
     );
-});
+}
 
 export default connect((state, ownProps) => {
     return {
         loading: state.loading.models.app,
     };
-})(Login);
+})(Form.create({})(Login));

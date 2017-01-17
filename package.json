@@ -11,6 +11,8 @@
     "babel-runtime": "^6.9.2",
     "dva": "^1.2.1",
     "dva-loading": "^0.2.0",
+    "marked": "^0.3.6",
+    "path-to-regexp": "^1.7.0",
     "qs": "^6.3.0",
     "react": "^15.4.0",
     "react-dom": "^15.4.0"

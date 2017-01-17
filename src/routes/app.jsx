@@ -1,6 +1,6 @@
 import React, {PropTypes} from 'react';
 import {connect} from 'dva';
-import MainLayout from '../components/MainLayout';
+import MainLayout from '../components/MainLayout/MainLayout';
 
 const App = ({
     children,

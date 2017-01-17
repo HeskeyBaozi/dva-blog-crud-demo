@@ -1,8 +1,8 @@
 import React, {PropTypes} from 'react';
-import {Layout, Menu, Breadcrumb, Card} from 'antd';
+import {Layout, Menu, Breadcrumb} from 'antd';
 import LogoImg from '../../assets/dog_48px_1182381_easyicon.net.png';
-import styles from './index.less';
-import UserInfo from './UserInfo';
+import styles from './MainLayout.less';
+import UserInfo from './UserInfo/UserInfo';
 const {Header, Content, Footer} = Layout;
 
 const MainLayout = ({
@@ -14,6 +14,7 @@ const MainLayout = ({
 }) => {
 
     const menuProps = {
+        theme: 'dark',
         mode: 'horizontal',
         defaultSelectedKeys: ['1'],
     };

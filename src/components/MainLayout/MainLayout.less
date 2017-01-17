@@ -1,6 +1,13 @@
 .layoutContainer > div {
-  padding-left: 10%;
-  padding-right: 10%;
+  @media (max-width: 768px) {
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+
+  @media (min-width: 768px) {
+    padding-right: 15%;
+    padding-left: 15%;
+  }
 }
 
 .header {
@@ -8,11 +15,7 @@
 }
 
 .menu {
-  vertical-align: middle;
-  height: 100%;
-  line-height: 63px;
   font-size: 1.1em;
-
 }
 
 .logo {

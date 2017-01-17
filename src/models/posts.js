@@ -1,17 +1,19 @@
-import {fetchPosts} from '../services/posts';
+import {fetchPosts, fetchContent} from '../services/posts';
+import pathToRegExp from 'path-to-regexp';
 
 export default {
     namespace: 'posts',
     state: {
         postsList: [],
-        paging: {}
+        paging: {},
+        postsById: {}
     },
     subscriptions: {
         setup: function ({history, dispatch}) {
             history.listen(location => {
                 if (['/posts'].includes(location.pathname)) {
                     dispatch({
-                        type: 'queryPosts',
+                        type: 'fetchPostsList',
                         payload: {
                             pageInfo: {
                                 limit: 5,
@@ -20,30 +22,65 @@ export default {
                         }
                     });
                 }
+
+                const match = pathToRegExp('/posts/:post_id').exec(location.pathname);
+                if (match) {
+                    const post_id = match[1];
+                    dispatch({
+                        type: 'fetchPostContent',
+                        payload: {post_id}
+                    });
+                }
             });
         }
     },
     effects: {
-        queryPosts: function *({payload}, {call, put, select}) {
+        fetchPostsList: function *({payload}, {call, put}) {
             const {pageInfo} = payload;
-            const {data} = yield call(fetchPosts, {pageInfo});
+            const {data:list} = yield call(fetchPosts, {pageInfo});
+
+            if (list) {
+                yield put({
+                    type: 'savePostsList',
+                    payload: list
+                });
+            }
+        },
+        fetchPostContent: function*({payload}, {call, put}) {
+            const {post_id} = payload;
+            const {data} = yield call(fetchContent, {post_id});
 
             if (data) {
+                const {content} = data;
                 yield put({
-                    type: 'queryPostsSuccess',
-                    payload: data
-                })
+                    type: 'savePostContent',
+                    payload: {content, post_id}
+                });
             }
         }
     },
     reducers: {
-        queryPostsSuccess: function (state, {payload}) {
-            const {paging, data} = payload;
+        savePostsList: function (state, {payload}) {
+            const {paging, data:list} = payload;
+
+            const posts = list.reduce((memo, post) => {
+                memo[post.post_id] = post;
+                return memo;
+            }, {});
+
             return {
                 ...state,
                 paging,
-                postsList: data
+                postsList: list,
+                postsById: {...state.postsById, ...posts}
             };
+        },
+        savePostContent: function (state, {payload}) {
+            const {content, post_id} = payload;
+            return {
+                ...state,
+                postsById: {...state.postsById, [post_id]: {...state.postsById[post_id], content}}
+            }
         }
     }
 }

@@ -1,6 +1,5 @@
 import dva from 'dva';
 import {message} from 'antd';
-import {routerRedux} from 'dva/router';
 import createLoading from 'dva-loading';
 import './index.html';
 import './index.less';
@@ -9,7 +8,11 @@ import './index.less';
 const app = dva({
     onError(e, dispatch) {
         dispatch({type: 'app/logout'});
-        message.error(e.message, 5);
+        if (e.message === 'Unauthorized') {
+            message.info('Please Login :)', 5);
+        } else {
+            message.error(e.message, 5);
+        }
     }
 });
 

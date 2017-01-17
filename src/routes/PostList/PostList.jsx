@@ -1,7 +1,7 @@
 import React from 'react';
 import {connect} from 'dva';
 import {Link} from 'dva/router';
-import styles from './index.css';
+import styles from './PostList.css';
 import {Table, Card} from 'antd';
 import moment from 'moment';
 
@@ -16,14 +16,22 @@ function PostList({
     const columnProps = {
         title: 'posts',
         key: 'posts',
-        render: (text, record, index) => {
-            return (<Link to={`/posts/${record.post_id}`}>
+        render: (text, record) => {
+            const {
+                post_id,
+                descendants,
+                author,
+                created_at,
+                title
+            } = record;
+
+            return (<Link to={`/posts/${post_id}`}>
                 <Card>
                     <div className={styles.cardContent}>
-                        <span className={styles.commentNumber}>{record.descendants.length}</span>
+                        <span className={styles.commentNumber}>{descendants.length}</span>
                         <span>
-                            <h3>{record.title}</h3>
-                            <p>By <em>{record.author_id}</em> | {moment.unix(record.created_at).fromNow()}</p>
+                            <h3>{title}</h3>
+                            <p>By <em>{author.username}</em> | {moment(created_at).fromNow()}</p>
                         </span>
                     </div>
                 </Card>
@@ -39,7 +47,7 @@ function PostList({
         showQuickJumper: true,
         onChange: nextPage => {
             dispatch({
-                type: 'posts/queryPosts',
+                type: 'posts/fetchPostsList',
                 payload: {
                     pageInfo: {
                         limit: 5,
@@ -50,7 +58,7 @@ function PostList({
         },
         onShowSizeChange: (current, size) => {
             dispatch({
-                type: 'posts/queryPosts',
+                type: 'posts/fetchPostsList',
                 payload: {
                     pageInfo: {
                         limit: size,

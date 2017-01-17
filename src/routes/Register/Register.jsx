@@ -1,13 +1,12 @@
 import React from 'react';
-import styles from './index.css';
+import styles from './Register.css';
 import {Link} from 'dva/router';
 import LoginLayout from '../../components/LoginLayout/LoginLayout';
 
 import {Form, Input, Button, Icon} from 'antd';
 
-const FormItem = Form.Item;
 
-const Register = Form.create()(({form}) => {
+function Register({form}) {
     let passwordDirty = false;
     const getFieldDecorator = form.getFieldDecorator;
 
@@ -58,7 +57,7 @@ const Register = Form.create()(({form}) => {
             <div className={styles.container}>
                 <div className={styles.logo}>Welcome to Register!</div>
                 <Form horizontal onSubmit={handleSubmit}>
-                    <FormItem
+                    <Form.Item
                         {...formItemLayout}
                         label="UserName"
                         hasFeedback
@@ -73,8 +72,8 @@ const Register = Form.create()(({form}) => {
                                 ],
                             })(<Input addonBefore={<Icon type="user"/>}/>)
                         }
-                    </FormItem>
-                    <FormItem
+                    </Form.Item>
+                    <Form.Item
                         {...formItemLayout}
                         label="E-mail"
                         hasFeedback
@@ -93,8 +92,8 @@ const Register = Form.create()(({form}) => {
                                 ],
                             })(<Input addonBefore={<Icon type="mail"/>}/>)
                         }
-                    </FormItem>
-                    <FormItem
+                    </Form.Item>
+                    <Form.Item
                         {...formItemLayout}
                         label="Password"
                         hasFeedback
@@ -112,8 +111,8 @@ const Register = Form.create()(({form}) => {
                                 ],
                             })(<Input type="password" onBlur={handlePasswordBlue} addonBefore={<Icon type="lock"/>}/>)
                         }
-                    </FormItem>
-                    <FormItem
+                    </Form.Item>
+                    <Form.Item
                         {...formItemLayout}
                         label="Confirm Password"
                         hasFeedback
@@ -127,15 +126,15 @@ const Register = Form.create()(({form}) => {
                                 }],
                             })(<Input type="password" addonBefore={<Icon type="lock"/>}/>)
                         }
-                    </FormItem>
-                    <FormItem {...tailFormItemLayout}>
+                    </Form.Item>
+                    <Form.Item {...tailFormItemLayout}>
                         <Button type="primary" htmlType="submit" size="large">Register</Button>
                         <span className={styles.toOther}>Have an account? <Link to="/login">Log in!</Link></span>
-                    </FormItem>
+                    </Form.Item>
                 </Form>
             </div>
         </LoginLayout>
     );
-});
+}
 
-export default Register;
+export default Form.create()(Register);
