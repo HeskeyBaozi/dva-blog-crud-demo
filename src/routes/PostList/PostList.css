@@ -1,7 +1,4 @@
 
-.normal {
-}
-
 .commentNumber {
     display: inline-block;
     width: 50px;
@@ -9,7 +6,7 @@
     text-align: center;
     line-height: 50px;
     font-size: 3em;
-    border-right: 1px solid rgba(165, 165, 165, 0.63);
+    border-right: 1px solid rgba(165, 165, 165, 0.31);
     margin-right: 20px;
     padding-right: 10px;
 }
@@ -17,4 +14,12 @@
 .cardContent {
     display: flex;
     align-items: center;
+}
+
+.addPost {
+    float: right;
+}
+
+.icon {
+    margin-right: 8px;
 }

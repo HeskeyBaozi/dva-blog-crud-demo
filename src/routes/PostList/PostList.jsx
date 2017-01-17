@@ -2,7 +2,7 @@ import React from 'react';
 import {connect} from 'dva';
 import {Link} from 'dva/router';
 import styles from './PostList.css';
-import {Table, Card} from 'antd';
+import {Table, Card, Button, Icon} from 'antd';
 import moment from 'moment';
 
 const {Column} = Table;
@@ -74,15 +74,17 @@ function PostList({
         showHeader: false,
         rowKey: 'post_id',
         pagination,
-        loading
+        loading,
+        title: () => <div>
+            <Button type="primary" size="large" icon="addfile" className={styles.addPost}>Add Post</Button>
+            <h1><Icon type="file-text" className={styles.icon}/>Posts</h1>
+        </div>
     };
 
     return (
-        <div className={styles.normal}>
-            <Table {...tableProps}>
-                <Column {...columnProps}/>
-            </Table>
-        </div>
+        <Table {...tableProps}>
+            <Column {...columnProps}/>
+        </Table>
     );
 }
 

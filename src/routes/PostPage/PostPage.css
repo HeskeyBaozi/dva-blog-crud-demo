@@ -10,3 +10,9 @@
 .leading {
     text-align: center;
 }
+
+.postMeta {
+    border-bottom: 1px solid rgba(128, 128, 128, 0.5);
+    padding-bottom: 16px;
+    margin-bottom: 16px;
+}

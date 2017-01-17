@@ -6,6 +6,6 @@ module.exports = () => {
         'layout-header-background': leadingColor,
         'menu-dark-bg': leadingColor,
         'layout-header-height': 'min-content',
-        'layout-body-background': '#ffffff'
+        'layout-body-background': '#f5f6f8'
     };
 };
