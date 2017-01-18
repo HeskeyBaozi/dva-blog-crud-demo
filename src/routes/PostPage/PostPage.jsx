@@ -34,11 +34,20 @@ function PostPage({
         loading: loading.comments,
         descendants,
         publishComment,
-        user_id
+        user_id,
+        getConfirmHandler: ({comment_id, ascendant}) => () => {
+            dispatch({
+                type: 'posts/deleteComment',
+                payload: {comment_id, ascendant}
+            });
+        }
     };
 
     function publishComment({commentInput}) {
-        dispatch({type: 'posts/createNewComment', payload: {commentInput, post_id}});
+        dispatch({
+            type: 'posts/createNewComment',
+            payload: {commentInput, post_id}
+        });
     }
 
     return (

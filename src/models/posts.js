@@ -1,4 +1,4 @@
-import {fetchPosts, fetchContent, fetchComments, createComment} from '../services/posts';
+import {fetchPosts, fetchContent, fetchComments, createComment, deleteComment} from '../services/posts';
 import pathToRegExp from 'path-to-regexp';
 
 export default {
@@ -83,6 +83,14 @@ export default {
                     payload: {newComment, post_id}
                 });
             }
+        },
+        deleteComment: function*({payload}, {call, put}) {
+            const {comment_id, ascendant} = payload;
+            yield call(deleteComment, {comment_id});
+            yield put({
+                type: 'removeComment',
+                payload: {comment_id, ascendant}
+            });
         }
     },
     reducers: {
@@ -136,6 +144,20 @@ export default {
                         descendants: [...currentPost.descendants, newComment]
                     }
 
+                }
+            };
+        },
+        removeComment: function (state, {payload}) {
+            const {comment_id, ascendant} = payload;
+            const currentPost = state.postsById[ascendant];
+            return {
+                ...state,
+                postsById: {
+                    ...state.postsById,
+                    [ascendant]: {
+                        ...currentPost,
+                        descendants: currentPost.descendants.filter(comment => comment.comment_id !== comment_id)
+                    }
                 }
             };
         }

@@ -48,3 +48,13 @@ export function createComment({post_id, commentInput}) {
         })
     });
 }
+
+export function deleteComment({comment_id}) {
+    const token = window.localStorage.getItem(storageTokenKey);
+    return request(`/api/comments/${comment_id}`, {
+        method: 'delete',
+        headers: new Headers({
+            "Authorization": `Bearer ${token}`
+        })
+    });
+}

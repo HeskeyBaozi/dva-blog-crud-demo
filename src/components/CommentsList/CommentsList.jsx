@@ -9,7 +9,8 @@ function CommentsList({
     descendants,
     loading,
     publishComment,
-    user_id
+    user_id,
+    getConfirmHandler
 }) {
 
     const columnProps = {
@@ -20,16 +21,18 @@ function CommentsList({
                 content,
                 author,
                 created_at,
-                visible
+                visible,
+                comment_id,
+                ascendant
             } = record;
 
             const popConfirmProps = {
                 title: 'Are you sure to delete this comment?',
                 okText: 'Yes, sure',
-                cancelText: 'Cancel'
+                cancelText: 'Cancel',
+                onConfirm: getConfirmHandler({comment_id, ascendant})
             };
 
-            console.log(author);
             return (
                 <div>
                     <div className={styles.content}>{visible ? content : 'can not see'}</div>
@@ -82,7 +85,8 @@ CommentsList.propTypes = {
     descendants: PropTypes.array.isRequired,
     loading: PropTypes.bool.isRequired,
     publishComment: PropTypes.func.isRequired,
-    user_id: PropTypes.string.isRequired
+    user_id: PropTypes.string.isRequired,
+    getConfirmHandler: PropTypes.func.isRequired
 };
 
 export default CommentsList;
