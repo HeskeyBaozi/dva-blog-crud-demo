@@ -19,9 +19,7 @@ function PostContent({
             <div className={styles.content}>
                 {
                     visible
-                        ? content
-                            ? <div dangerouslySetInnerHTML={{__html: marked(content)}}/>
-                            : <div>{content}</div>
+                        ? <div dangerouslySetInnerHTML={{__html: marked(content)}}/>
                         : <Alert {...alertProps}/>
                 }
             </div>
@@ -31,7 +29,7 @@ function PostContent({
 
 PostContent.propTypes = {
     visible: PropTypes.bool.isRequired,
-    content: PropTypes.string,
+    content: PropTypes.string.isRequired,
     loading: PropTypes.bool.isRequired
 };
 

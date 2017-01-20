@@ -2,17 +2,11 @@ import React, {PropTypes} from 'react';
 import moment from 'moment';
 import {connect} from 'dva';
 import PostContent from '../../components/PostContent/PostContent';
-import {Spin} from 'antd';
 import styles from './PostPage.css';
 import CommentsList from '../../components/CommentsList/CommentsList';
 
 function PostPage({
-    currentPost,
-    loading,
-    dispatch,
-    account
-}) {
-    const {
+    currentPost:{
         title,
         author,
         content,
@@ -20,35 +14,38 @@ function PostPage({
         created_at,
         descendants,
         post_id
-    } = currentPost;
-
-    const {user_id} = account;
-
+    },
+    loading,
+    dispatch,
+    account:{user_id}
+}) {
     const postContentProps = {
         loading: loading.content,
         visible,
-        content
+        content: content || 'Loading...'
     };
 
+    const commentsReady = descendants.length && descendants[0].comment_id;
     const commentsListProps = {
         loading: loading.comments,
-        descendants,
-        publishComment,
+        descendants: commentsReady ? descendants : [], // coming from state.posts.currentPost.descendants...
+        publishComment: ({commentInput}) => {
+            dispatch({
+                type: 'posts/createNewComment',
+                payload: {commentInput}
+            });
+        },
+        patchComment: ({editorContent}) => {
+
+        },
         user_id,
-        getConfirmHandler: ({comment_id, ascendant}) => () => {
+        getConfirmHandler: ({comment_id}) => () => {
             dispatch({
                 type: 'posts/deleteComment',
-                payload: {comment_id, ascendant}
+                payload: {comment_id}
             });
         }
     };
-
-    function publishComment({commentInput}) {
-        dispatch({
-            type: 'posts/createNewComment',
-            payload: {commentInput, post_id}
-        });
-    }
 
     return (
         <div>
@@ -68,9 +65,8 @@ PostPage.propTypes = {
 };
 
 function mapStateToProps(state, ownProps) {
-    const post_id = ownProps.params.post_id;
     return {
-        currentPost: state.posts.postsById[post_id],
+        currentPost: state.posts.currentPost,
         loading: {
             content: state.loading.effects['posts/fetchPostContent'],
             comments: state.loading.effects['posts/fetchPostComments']

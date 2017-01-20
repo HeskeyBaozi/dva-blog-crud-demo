@@ -3,6 +3,7 @@
 import {auth, fetchUser} from '../services/app';
 import {routerRedux} from 'dva/router';
 import {storageTokenKey} from '../utils/constant';
+import {message} from 'antd';
 
 export default {
     namespace: 'app',
@@ -33,20 +34,24 @@ export default {
          */
         auth: function *({payload}, {call, put}) {
             const {username, password} = payload;
-            const {data} = yield call(auth, {username, password});
+            try {
+                const {data} = yield call(auth, {username, password});
 
-            // succeed to login
-            if (data) {
-                const {user, access_token} = data;
-                const {token} = access_token;
+                // succeed to login
+                if (data) {
+                    const {user, access_token} = data;
+                    const {token} = access_token;
 
-                // save the token to the local storage.
-                window.localStorage.setItem(storageTokenKey, token);
-                yield put({
-                    type: 'authSuccess',
-                    payload: {account: user}
-                });
-                yield put(routerRedux.push('/posts'));
+                    // save the token to the local storage.
+                    window.localStorage.setItem(storageTokenKey, token);
+                    yield put({
+                        type: 'authSuccess',
+                        payload: {account: user}
+                    });
+                    yield put(routerRedux.push('/posts'));
+                }
+            } catch (error) {
+                message.error('Wrong Username or Password.. :(', 4);
             }
         },
         /**

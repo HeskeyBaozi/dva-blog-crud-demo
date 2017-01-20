@@ -2,6 +2,7 @@ import React, {PropTypes} from 'react';
 import {Table, Icon, Button, Popconfirm} from 'antd';
 import Publish from '../CommentsPublish/CommentsPublish';
 import styles from './CommentsList.css';
+import Editor from '../Editor/Editor';
 import moment from 'moment';
 const {Column} = Table;
 
@@ -23,14 +24,13 @@ function CommentsList({
                 created_at,
                 visible,
                 comment_id,
-                ascendant
             } = record;
 
             const popConfirmProps = {
                 title: 'Are you sure to delete this comment?',
                 okText: 'Yes, sure',
                 cancelText: 'Cancel',
-                onConfirm: getConfirmHandler({comment_id, ascendant})
+                onConfirm: getConfirmHandler({comment_id})
             };
 
             return (
@@ -42,7 +42,9 @@ function CommentsList({
                     {
                         user_id === author.user_id ?
                             <Button.Group className={styles.panel}>
-                                <Button size="small" type="ghost" icon="edit">Edit</Button>
+                                <Editor>
+                                    <Button size="small" type="ghost" icon="edit">Edit</Button>
+                                </Editor>
                                 <Popconfirm {...popConfirmProps}>
                                     <Button size="small" type="ghost" icon="delete">Delete</Button>
                                 </Popconfirm>
@@ -53,10 +55,8 @@ function CommentsList({
         }
     };
 
-    const commentsReady = descendants.length && descendants[0].comment_id;
-
     const tableProps = {
-        dataSource: commentsReady ? descendants : [],
+        dataSource: descendants,
         showHeader: false,
         rowKey: 'comment_id',
         loading,
@@ -86,7 +86,8 @@ CommentsList.propTypes = {
     loading: PropTypes.bool.isRequired,
     publishComment: PropTypes.func.isRequired,
     user_id: PropTypes.string.isRequired,
-    getConfirmHandler: PropTypes.func.isRequired
+    getConfirmHandler: PropTypes.func.isRequired,
+    patchComment: PropTypes.func.isRequired
 };
 
 export default CommentsList;

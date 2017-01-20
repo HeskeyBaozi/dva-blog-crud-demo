@@ -66,7 +66,7 @@ function Login({
                             getFieldDecorator('remember', {
                                 valuePropName: 'checked',
                                 initialValue: true
-                            })(<Checkbox>Remember me</Checkbox>)
+                            })(<Checkbox disabled>Remember me</Checkbox>)
                         }
                         <span className={styles.toOther }>Or <Link to="/register">register now!</Link></span>
                         <Button

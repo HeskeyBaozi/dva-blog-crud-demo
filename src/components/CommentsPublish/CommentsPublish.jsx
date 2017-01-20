@@ -14,14 +14,14 @@ function CommentsPublish({
 
     const formProps = {
         onSubmit: handlePublish,
-        className:styles.form
+        className: styles.form
     };
     const buttonProps = {
         loading,
         type: 'primary',
         size: 'large',
         icon: 'plus-square-o',
-        className:styles.button,
+        className: styles.button,
         htmlType: 'submit'
     };
 
@@ -46,7 +46,7 @@ function CommentsPublish({
                                 message: 'Please input your comment...'
                             }
                         ]
-                    })(<Input type="textarea" placeholder="Add Comment..." autosize={true}/>)
+                    })(<Input type="textarea" placeholder="Add Comment..." rows={3}/>)
                 }
             </Form.Item>
             <Form.Item>

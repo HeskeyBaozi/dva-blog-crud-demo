@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {PropTypes} from 'react';
 import {connect} from 'dva';
 import {Link} from 'dva/router';
 import styles from './PostList.css';
@@ -88,10 +88,18 @@ function PostList({
     );
 }
 
+PostList.propTypes = {
+    dispatch: PropTypes.func.isRequired,
+    postsList: PropTypes.array.isRequired,
+    paging: PropTypes.object.isRequired,
+    loading: PropTypes.bool.isRequired
+};
+
 function mapStateToProps(state) {
     return {
-        ...state.posts,
-        loading: state.loading.models.posts,
+        postsList: state.posts.postsList,
+        paging: state.posts.paging,
+        loading: state.loading.effects['posts/fetchPostsList']
     };
 }
 

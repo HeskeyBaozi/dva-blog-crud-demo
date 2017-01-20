@@ -1,12 +1,22 @@
 import {fetchPosts, fetchContent, fetchComments, createComment, deleteComment} from '../services/posts';
 import pathToRegExp from 'path-to-regexp';
+import {message} from 'antd';
 
 export default {
     namespace: 'posts',
     state: {
         postsList: [],
         paging: {},
-        postsById: {}
+        postsById: {},
+        currentPost: {
+            post_id: null,
+            author: null,
+            title: null,
+            visible: null,
+            created_at: null,
+            descendants: [],
+            content: null
+        }
     },
     subscriptions: {
         setup: function ({history, dispatch}) {
@@ -27,12 +37,7 @@ export default {
                 if (match) {
                     const post_id = match[1];
                     dispatch({
-                        type: 'fetchPostContent',
-                        payload: {post_id}
-                    });
-
-                    dispatch({
-                        type: 'fetchPostComments',
+                        type: 'displayPost',
                         payload: {post_id}
                     });
                 }
@@ -51,46 +56,66 @@ export default {
                 });
             }
         },
-        fetchPostContent: function*({payload}, {call, put}) {
+        displayPost: function*({payload}, {put}) {
+            yield put({
+                type: 'clearCurrentPostInfo'
+            });
             const {post_id} = payload;
+            yield put({
+                type: 'saveCurrentPostInfo',
+                payload: {post_id}
+            });
+
+            yield [
+                put({type: 'fetchPostContent'}),
+                put({type: 'fetchPostComments'})
+            ];
+
+        },
+        fetchPostContent: function*({payload}, {call, put, select}) {
+            const post_id = yield select(state => state.posts.currentPost.post_id);
             const {data} = yield call(fetchContent, {post_id});
 
             if (data) {
                 const {content} = data;
                 yield put({
                     type: 'savePostContent',
-                    payload: {content, post_id}
+                    payload: {content}
                 });
             }
         },
-        fetchPostComments: function*({payload}, {call, put}) {
-            const {post_id} = payload;
+        fetchPostComments: function*({payload}, {call, put, select}) {
+            const post_id = yield select(state => state.posts.currentPost.post_id);
             const {data} = yield call(fetchComments, {post_id});
             if (data) {
                 const {descendants} = data;
                 yield put({
                     type: 'saveComments',
-                    payload: {descendants, post_id}
+                    payload: {descendants}
                 });
             }
         },
-        createNewComment: function*({payload}, {call, put}) {
-            const {commentInput, post_id} = payload;
-            const {data:newComment} = yield call(createComment, {post_id, commentInput});
+        createNewComment: function*({payload}, {call, put, select}) {
+            const post_id = yield select(state => state.posts.currentPost.post_id);
+            const {commentInput} = payload;
+            const {data:newComment} = yield call(createComment, {commentInput, post_id});
             if (newComment) {
                 yield put({
                     type: 'pushNewComment',
                     payload: {newComment, post_id}
                 });
+                message.success('create comment successfully. :)');
             }
         },
-        deleteComment: function*({payload}, {call, put}) {
-            const {comment_id, ascendant} = payload;
+        deleteComment: function*({payload}, {call, put, select}) {
+            const ascendant = yield select(state => state.posts.currentPost.post_id);
+            const {comment_id} = payload;
             yield call(deleteComment, {comment_id});
             yield put({
                 type: 'removeComment',
                 payload: {comment_id, ascendant}
             });
+            message.success('Delete comment successfully. :)');
         }
     },
     reducers: {
@@ -109,26 +134,47 @@ export default {
                 postsById: {...state.postsById, ...posts}
             };
         },
-        savePostContent: function (state, {payload}) {
-            const {content, post_id} = payload;
+        clearCurrentPostInfo: function (state, {payload}) {
             return {
                 ...state,
-                postsById: {
-                    ...state.postsById,
-                    [post_id]: {...state.postsById[post_id], content}
+                currentPost: {
+                    post_id: null,
+                    author: null,
+                    title: null,
+                    visible: null,
+                    created_at: null,
+                    descendants: [],
+                    content: null
+                }
+            };
+        },
+        saveCurrentPostInfo: function (state, {payload}) {
+            const {post_id} = payload;
+            return {
+                ...state,
+                currentPost: {
+                    ...state.currentPost,
+                    ...state.postsById[post_id]
+                }
+            };
+        },
+        savePostContent: function (state, {payload}) {
+            const {content} = payload;
+            return {
+                ...state,
+                currentPost: {
+                    ...state.currentPost,
+                    content
                 }
             };
         },
         saveComments: function (state, {payload}) {
-            const {descendants, post_id} = payload;
+            const {descendants} = payload;
             return {
                 ...state,
-                postsById: {
-                    ...state.postsById,
-                    [post_id]: {
-                        ...state.postsById[post_id],
-                        descendants
-                    }
+                currentPost: {
+                    ...state.currentPost,
+                    descendants
                 }
             };
         },
@@ -141,9 +187,12 @@ export default {
                     ...state.postsById,
                     [post_id]: {
                         ...currentPost,
-                        descendants: [...currentPost.descendants, newComment]
+                        descendants: [...currentPost.descendants, newComment.comment_id]
                     }
-
+                },
+                currentPost: {
+                    ...state.currentPost,
+                    descendants: [...state.currentPost.descendants, newComment]
                 }
             };
         },
@@ -156,8 +205,12 @@ export default {
                     ...state.postsById,
                     [ascendant]: {
                         ...currentPost,
-                        descendants: currentPost.descendants.filter(comment => comment.comment_id !== comment_id)
+                        descendants: currentPost.descendants.filter(comment => comment !== comment_id)
                     }
+                },
+                currentPost: {
+                    ...state.currentPost,
+                    descendants: state.currentPost.descendants.filter(comment => comment.comment_id !== comment_id)
                 }
             };
         }
