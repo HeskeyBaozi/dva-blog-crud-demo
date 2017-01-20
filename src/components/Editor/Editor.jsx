@@ -1,51 +1,66 @@
 import React, {PropTypes} from 'react';
-import {Popover} from 'antd';
 import styles from './Editor.less';
-import EditorBody from './EditorBody';
+import {Input, Button, Modal, Form} from 'antd';
 
-class Editor extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            visible: false
-        };
-    }
+function EditorBody({
+    loading,
+    initialValue,
+    visible,
+    commit,
+    onClose,
+    form
+}) {
+    const {validateFields, getFieldDecorator} = form;
 
-    hide = () => {
-        this.setState({
-            visible: false,
+    function handleSubmit(e) {
+        e.preventDefault();
+        validateFields((error, {editorContent}) => {
+            if (!error) {
+                commit({editorContent});
+            }
         });
-    };
-
-    handleVisibleChange = visible => {
-        this.setState({visible});
-    };
-
-    render() {
-        const {children} = this.props;
-
-        function commit({editorContent}) {
-
-        }
-
-
-        return (
-            <Popover
-                content={<EditorBody commit={commit} onClose={this.hide} initialValue={'test'}/>}
-                title={<h3>Editor</h3>}
-                trigger="click"
-                visible={this.state.visible}
-                onVisibleChange={this.handleVisibleChange}
-            >
-                {children}
-            </Popover>
-        );
     }
+
+    return (
+        <Modal
+            visible={visible}
+            title={<h3>Editor</h3>}
+            onCancel={onClose}
+            footer={[
+                <Button key="close" type="ghost" onClick={onClose}>Close</Button>,
+                <Button key="submit"
+                        htmlType="submit"
+                        type="primary"
+                        icon="edit"
+                        onClick={handleSubmit}
+                        loading={loading}
+                >Patch</Button>
+            ]}
+        >
+            <Form>
+                <Form.Item>
+                    {
+                        getFieldDecorator('editorContent', {
+                            initialValue,
+                            rules: [
+                                {
+                                    required: true,
+                                    message: 'The content cannot be empty.'
+                                }
+                            ]
+                        })(<Input type="textarea" rows={5}/>)
+                    }
+                </Form.Item>
+            </Form>
+        </Modal>
+    );
 }
 
-Editor.propTypes = {
-    children: PropTypes.element.isRequired
+EditorBody.propTypes = {
+    initialValue: PropTypes.string.isRequired,
+    commit: PropTypes.func.isRequired,
+    onClose: PropTypes.func.isRequired,
+    visible: PropTypes.bool.isRequired
 };
 
-
-export default Editor;
+export default Form.create({})(EditorBody);

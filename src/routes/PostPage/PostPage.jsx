@@ -12,11 +12,11 @@ function PostPage({
         content,
         visible,
         created_at,
-        descendants,
-        post_id
+        descendants
     },
     loading,
     dispatch,
+    isEditing,
     account:{user_id}
 }) {
     const postContentProps = {
@@ -27,24 +27,13 @@ function PostPage({
 
     const commentsReady = descendants.length && descendants[0].comment_id;
     const commentsListProps = {
-        loading: loading.comments,
-        descendants: commentsReady ? descendants : [], // coming from state.posts.currentPost.descendants...
-        publishComment: ({commentInput}) => {
-            dispatch({
-                type: 'posts/createNewComment',
-                payload: {commentInput}
-            });
-        },
-        patchComment: ({editorContent}) => {
-
-        },
+        loadingComments: loading.comments,
+        loadingPatch: loading.patchComment,
+        isEditing,
+        dispatch,
+        descendants: commentsReady ? descendants : [], // coming from state.posts.current.descendants...
         user_id,
-        getConfirmHandler: ({comment_id}) => () => {
-            dispatch({
-                type: 'posts/deleteComment',
-                payload: {comment_id}
-            });
-        }
+
     };
 
     return (
@@ -59,17 +48,19 @@ function PostPage({
 
 PostPage.propTypes = {
     currentPost: PropTypes.object.isRequired,
-    loading: PropTypes.object.isRequired,
     dispatch: PropTypes.func.isRequired,
-    account: PropTypes.object.isRequired
+    account: PropTypes.object.isRequired,
+    isEditing: PropTypes.bool.isRequired
 };
 
 function mapStateToProps(state, ownProps) {
     return {
-        currentPost: state.posts.currentPost,
+        currentPost: state.posts.current.post,
+        isEditing: state.posts.current.isEditing,
         loading: {
             content: state.loading.effects['posts/fetchPostContent'],
-            comments: state.loading.effects['posts/fetchPostComments']
+            comments: state.loading.effects['posts/fetchPostComments'],
+            patchComment: state.loading.effects['posts/patchComment']
         },
         account: state.app.account
     };

@@ -2,16 +2,17 @@ import React, {PropTypes} from 'react';
 import {Table, Icon, Button, Popconfirm} from 'antd';
 import Publish from '../CommentsPublish/CommentsPublish';
 import styles from './CommentsList.css';
-import Editor from '../Editor/Editor';
 import moment from 'moment';
+import Editor from '../Editor/Editor';
 const {Column} = Table;
 
 function CommentsList({
     descendants,
-    loading,
-    publishComment,
+    loadingComments,
+    loadingPatch,
     user_id,
-    getConfirmHandler
+    isEditing,
+    dispatch
 }) {
 
     const columnProps = {
@@ -26,11 +27,28 @@ function CommentsList({
                 comment_id,
             } = record;
 
+
+            const editorProps = {
+                visible: isEditing,
+                initialValue: content,
+                loading: loadingPatch,
+                onClose: () => dispatch({type: 'posts/closeEditor'}),
+                commit: ({editorContent}) => dispatch({
+                    type: 'posts/patchComment',
+                    payload: {editorContent, comment_id}
+                })
+            };
+
             const popConfirmProps = {
                 title: 'Are you sure to delete this comment?',
                 okText: 'Yes, sure',
                 cancelText: 'Cancel',
-                onConfirm: getConfirmHandler({comment_id})
+                onConfirm() {
+                    dispatch({
+                        type: 'posts/deleteComment',
+                        payload: {comment_id}
+                    });
+                }
             };
 
             return (
@@ -42,11 +60,18 @@ function CommentsList({
                     {
                         user_id === author.user_id ?
                             <Button.Group className={styles.panel}>
-                                <Editor>
-                                    <Button size="small" type="ghost" icon="edit">Edit</Button>
-                                </Editor>
+                                <Button size="small"
+                                        type="ghost"
+                                        icon="edit"
+                                        onClick={() => dispatch({type: 'posts/showEditor'})}
+                                >
+                                    Edit
+                                </Button>
+                                <Editor {...editorProps}/>
                                 <Popconfirm {...popConfirmProps}>
-                                    <Button size="small" type="ghost" icon="delete">Delete</Button>
+                                    <Button size="small" type="ghost" icon="delete">
+                                        Delete
+                                    </Button>
                                 </Popconfirm>
                             </Button.Group> : null
                     }
@@ -55,39 +80,36 @@ function CommentsList({
         }
     };
 
-    const tableProps = {
-        dataSource: descendants,
-        showHeader: false,
-        rowKey: 'comment_id',
-        loading,
-        title: currentPageData => {
-            return <h2><Icon type="message" className={styles.icon}/>Comments</h2>;
-        },
-        size: 'small'
-    };
-
-    const publishProps = {
-        loading,
-        commit: publishComment
-    };
-
     return (
         <div>
-            <Table {...tableProps}>
+            <Table
+                loading={loadingComments}
+                rowKey="comment_id"
+                size="small"
+                showHeader={false}
+                dataSource={descendants}
+                title={() => <h2><Icon type="message" className={styles.icon}/>Comments</h2>}
+            >
                 <Column {...columnProps}/>
             </Table>
-            <Publish {...publishProps}/>
+            <Publish
+                loading={loadingComments}
+                commit={({commentInput}) => {
+                    dispatch({
+                        type: 'posts/createNewComment',
+                        payload: {commentInput}
+                    });
+                }}
+            />
         </div>
     );
 }
 
 CommentsList.propTypes = {
     descendants: PropTypes.array.isRequired,
-    loading: PropTypes.bool.isRequired,
-    publishComment: PropTypes.func.isRequired,
     user_id: PropTypes.string.isRequired,
-    getConfirmHandler: PropTypes.func.isRequired,
-    patchComment: PropTypes.func.isRequired
+    isEditing: PropTypes.bool.isRequired,
+    dispatch: PropTypes.func.isRequired
 };
 
 export default CommentsList;

@@ -1,4 +1,11 @@
-import {fetchPosts, fetchContent, fetchComments, createComment, deleteComment} from '../services/posts';
+import {
+    fetchPosts,
+    fetchContent,
+    fetchComments,
+    createComment,
+    deleteComment,
+    patchComment
+} from '../services/posts';
 import pathToRegExp from 'path-to-regexp';
 import {message} from 'antd';
 
@@ -8,14 +15,17 @@ export default {
         postsList: [],
         paging: {},
         postsById: {},
-        currentPost: {
-            post_id: null,
-            author: null,
-            title: null,
-            visible: null,
-            created_at: null,
-            descendants: [],
-            content: null
+        current: {
+            post: {
+                post_id: null,
+                author: null,
+                title: null,
+                visible: null,
+                created_at: null,
+                descendants: [],
+                content: null
+            },
+            isEditing: false
         }
     },
     subscriptions: {
@@ -73,7 +83,7 @@ export default {
 
         },
         fetchPostContent: function*({payload}, {call, put, select}) {
-            const post_id = yield select(state => state.posts.currentPost.post_id);
+            const post_id = yield select(state => state.posts.current.post.post_id);
             const {data} = yield call(fetchContent, {post_id});
 
             if (data) {
@@ -85,7 +95,7 @@ export default {
             }
         },
         fetchPostComments: function*({payload}, {call, put, select}) {
-            const post_id = yield select(state => state.posts.currentPost.post_id);
+            const post_id = yield select(state => state.posts.current.post.post_id);
             const {data} = yield call(fetchComments, {post_id});
             if (data) {
                 const {descendants} = data;
@@ -96,7 +106,7 @@ export default {
             }
         },
         createNewComment: function*({payload}, {call, put, select}) {
-            const post_id = yield select(state => state.posts.currentPost.post_id);
+            const post_id = yield select(state => state.posts.current.post_id);
             const {commentInput} = payload;
             const {data:newComment} = yield call(createComment, {commentInput, post_id});
             if (newComment) {
@@ -108,7 +118,7 @@ export default {
             }
         },
         deleteComment: function*({payload}, {call, put, select}) {
-            const ascendant = yield select(state => state.posts.currentPost.post_id);
+            const ascendant = yield select(state => state.posts.current.post_id);
             const {comment_id} = payload;
             yield call(deleteComment, {comment_id});
             yield put({
@@ -116,6 +126,14 @@ export default {
                 payload: {comment_id, ascendant}
             });
             message.success('Delete comment successfully. :)');
+        },
+        patchComment: function *({payload}, {call, put, select}) {
+            const {comment_id, editorContent} = payload;
+            const {data} = yield call(patchComment, {comment_id, editorContent});
+            if (data) {
+                yield put({type: 'saveUpdatedComment', payload: {updatedComment: data}});
+                message.success('Update comment successfully. :)');
+            }
         }
     },
     reducers: {
@@ -137,14 +155,19 @@ export default {
         clearCurrentPostInfo: function (state, {payload}) {
             return {
                 ...state,
-                currentPost: {
-                    post_id: null,
-                    author: null,
-                    title: null,
-                    visible: null,
-                    created_at: null,
-                    descendants: [],
-                    content: null
+                current: {
+                    ...state.current,
+                    post: {
+                        ...state.current.post,
+                        post_id: null,
+                        author: null,
+                        title: null,
+                        visible: null,
+                        created_at: null,
+                        descendants: [],
+                        content: null
+                    },
+                    isEditing: false
                 }
             };
         },
@@ -152,9 +175,12 @@ export default {
             const {post_id} = payload;
             return {
                 ...state,
-                currentPost: {
-                    ...state.currentPost,
-                    ...state.postsById[post_id]
+                current: {
+                    ...state.current,
+                    post: {
+                        ...state.current.post,
+                        ...state.postsById[post_id]
+                    }
                 }
             };
         },
@@ -162,9 +188,12 @@ export default {
             const {content} = payload;
             return {
                 ...state,
-                currentPost: {
-                    ...state.currentPost,
-                    content
+                current: {
+                    ...state.current,
+                    post: {
+                        ...state.current.post,
+                        content
+                    }
                 }
             };
         },
@@ -172,9 +201,12 @@ export default {
             const {descendants} = payload;
             return {
                 ...state,
-                currentPost: {
-                    ...state.currentPost,
-                    descendants
+                current: {
+                    ...state.current,
+                    post: {
+                        ...state.current.post,
+                        descendants
+                    }
                 }
             };
         },
@@ -190,9 +222,12 @@ export default {
                         descendants: [...currentPost.descendants, newComment.comment_id]
                     }
                 },
-                currentPost: {
-                    ...state.currentPost,
-                    descendants: [...state.currentPost.descendants, newComment]
+                current: {
+                    ...state.current,
+                    post: {
+                        ...state.current.post,
+                        descendants: [...state.current.post.descendants, newComment]
+                    }
                 }
             };
         },
@@ -208,11 +243,51 @@ export default {
                         descendants: currentPost.descendants.filter(comment => comment !== comment_id)
                     }
                 },
-                currentPost: {
-                    ...state.currentPost,
-                    descendants: state.currentPost.descendants.filter(comment => comment.comment_id !== comment_id)
+                current: {
+                    ...state.current,
+                    post: {
+                        ...state.current.post,
+                        descendants: state.current.post.descendants.filter(comment => comment.comment_id !== comment_id)
+                    }
                 }
             };
+        },
+        showEditor: function (state) {
+            return {
+                ...state,
+                current: {
+                    ...state.current,
+                    isEditing: true
+                }
+            };
+        },
+        closeEditor: function (state) {
+            return {
+                ...state,
+                current: {
+                    ...state.current,
+                    isEditing: false
+                }
+            };
+        },
+        saveUpdatedComment: function (state, {payload}) {
+            const {updatedComment} = payload;
+            return {
+                ...state,
+                current: {
+                    ...state.current,
+                    post: {
+                        ...state.current.post,
+                        descendants: state.current.post.descendants.map(comment => {
+                            if (comment.comment_id === updatedComment.comment_id) {
+                                return updatedComment;
+                            }
+                            return comment;
+                        })
+                    },
+                    isEditing: false
+                }
+            }
         }
     }
 }

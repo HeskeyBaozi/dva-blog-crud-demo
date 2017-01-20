@@ -92,7 +92,6 @@ PostList.propTypes = {
     dispatch: PropTypes.func.isRequired,
     postsList: PropTypes.array.isRequired,
     paging: PropTypes.object.isRequired,
-    loading: PropTypes.bool.isRequired
 };
 
 function mapStateToProps(state) {
