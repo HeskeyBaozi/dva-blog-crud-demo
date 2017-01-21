@@ -228,17 +228,9 @@ export default {
             };
         },
         pushNewComment: function (state, {payload}) {
-            const {newComment, post_id} = payload;
-            const currentPost = state.postsById[post_id];
+            const {newComment} = payload;
             return {
                 ...state,
-                postsById: {
-                    ...state.postsById,
-                    [post_id]: {
-                        ...currentPost,
-                        descendants: [...currentPost.descendants, newComment.comment_id]
-                    }
-                },
                 current: {
                     ...state.current,
                     post: {

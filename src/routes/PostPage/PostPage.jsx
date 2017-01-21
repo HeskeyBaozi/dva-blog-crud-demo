@@ -38,9 +38,7 @@ function PostPage({
     return (
         <div>
             <h1 className={styles.title}>{title}</h1>
-            <p className={styles.leading}>By
-                <em>{author.username}</em>, {moment(created_at).fromNow()}
-            </p>
+            <p className={styles.leading}>By <em>{author.username}</em>, {moment(created_at).fromNow()}</p>
             <PostContent {...postContentProps}/>
             <CommentsList {...commentsListProps}/>
         </div>

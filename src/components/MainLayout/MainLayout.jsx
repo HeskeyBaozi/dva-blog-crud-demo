@@ -1,5 +1,6 @@
 import React, {PropTypes} from 'react';
 import {Layout, Menu, Breadcrumb, Icon} from 'antd';
+import {Link} from 'dva/router';
 import LogoImg from '../../assets/dog_48px_1182381_easyicon.net.png';
 import styles from './MainLayout.less';
 import UserInfo from './UserInfo/UserInfo';
@@ -37,7 +38,11 @@ const MainLayout = ({
                     </div>
                     <UserInfo {...userInfoProps}/>
                     <Menu {...menuProps} >
-                        <Menu.Item key="1"><Icon type="file-text" className={styles.icon}/>Posts</Menu.Item>
+                        <Menu.Item key="1">
+                            <Link to="/posts">
+                                <Icon type="file-text" className={styles.icon}/>Posts
+                            </Link>
+                        </Menu.Item>
                         <Menu.Item key="2">User</Menu.Item>
                     </Menu>
                 </div>
