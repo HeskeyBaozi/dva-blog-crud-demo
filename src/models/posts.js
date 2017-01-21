@@ -15,7 +15,8 @@ import {
 import {
     createComment,
     deleteComment,
-    patchComment
+    patchComment,
+    setVisibilityOfComment
 } from '../services/comments';
 
 
@@ -156,7 +157,17 @@ export default {
             const {data:updatedPost} = yield call(setVisibilityOfPost, {visible, post_id});
             if (updatedPost) {
                 yield put({type: 'savePostVisibility', payload: {updatedPost}});
-                message.success('set Visibility successfully :)');
+                message.success('set post visibility successfully :)');
+            }
+        },
+        setCommentVisibility: function*({payload}, {call, put}) {
+            const {visible, comment_id} = payload;
+            const {data:updatedComment} = yield call(setVisibilityOfComment, {visible, comment_id});
+            if (updatedComment) {
+                yield put({
+                    type: 'saveCommentVisibility', payload: {updatedComment}
+                });
+                message.success('set comment visibility successfully :)');
             }
         },
         createNewPost: function*({payload}, {call, put}) {
@@ -359,6 +370,22 @@ export default {
                 postsList: state.postsList.map(post => {
                     return post_id === post.post_id ? updatedPost : post;
                 })
+            };
+        },
+        saveCommentVisibility: function (state, {payload}) {
+            const {updatedComment} = payload;
+            const {comment_id} = updatedComment;
+            return {
+                ...state,
+                current: {
+                    ...state.current,
+                    post: {
+                        ...state.current.post,
+                        descendants: state.current.post.descendants.map(comment => {
+                            return comment.comment_id === comment_id ? updatedComment : comment;
+                        })
+                    }
+                }
             };
         }
     }

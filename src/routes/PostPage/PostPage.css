@@ -11,3 +11,11 @@
     text-align: center;
 }
 
+.editPost {
+    position: absolute;
+    right: 0;
+}
+
+.header {
+    position: relative;
+}

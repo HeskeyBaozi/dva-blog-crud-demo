@@ -26,8 +26,6 @@ function RouterConfig({history, app}) {
 
     function requireTypeOrPostId(nextState, replace, callback) {
         const post_id = nextState.location.query.post_id;
-        console.log(post_id, 'post_id');
-        console.log(nextState.location);
         if (post_id || nextState.location.query.type) {
             if (post_id)
                 app._store.dispatch({

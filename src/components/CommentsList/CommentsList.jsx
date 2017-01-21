@@ -1,5 +1,5 @@
 import React, {PropTypes} from 'react';
-import {Table, Icon} from 'antd';
+import {Table, Icon, Alert} from 'antd';
 import Publish from '../CommentsPublish/CommentsPublish';
 import styles from './CommentsList.css';
 import moment from 'moment';
@@ -28,7 +28,11 @@ function CommentsList({
 
             return (
                 <div>
-                    <div className={styles.content}>{visible ? content : 'can not see'}</div>
+                    <div className={styles.content}>
+                        {visible ? content :
+                            <Alert type="warning" message="This Comment was hidden by the Super Admin..." showIcon/>
+                        }
+                    </div>
                     <p className={styles.meta}>
                         by <em>{author.username}</em>, {moment(created_at).fromNow()}
                     </p>
@@ -41,12 +45,18 @@ function CommentsList({
                             payload: {editorContent, comment_id},
                             onComplete
                         })}
-                        initialValue={visible ? content : ''}
+                        initialValue={content}
                         onDelete={() => dispatch({
                             type: 'posts/deleteComment',
                             payload: {comment_id}
                         })}
-                        onChangeVisibility={visible => console.log(visible)}
+                        onChangeVisibility={checked => dispatch({
+                            type: 'posts/setCommentVisibility',
+                            payload: {
+                                visible: !visible,
+                                comment_id
+                            }
+                        })}
                         patchLoading={loadingPatch}
                     />
                 </div>

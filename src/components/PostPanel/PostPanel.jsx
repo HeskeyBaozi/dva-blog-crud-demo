@@ -18,7 +18,8 @@ function PostPanel({
                 ? <Switch checked={visible}
                           checkedChildren="visible"
                           unCheckedChildren="unvisible"
-                          onChange={onChangeVisibility}/>
+                          onChange={onChangeVisibility}
+                          className={styles.switch}/>
                 : null
         }
         {

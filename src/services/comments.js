@@ -29,16 +29,30 @@ export function deleteComment({comment_id}) {
     });
 }
 
+export function setVisibilityOfComment({comment_id, visible}) {
+    const token = window.localStorage.getItem(storageTokenKey);
+    return request(`/api/comments/${comment_id}`, {
+        method: 'PATCH',
+        headers: new Headers({
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json; charset=utf-8"
+        }),
+        body: JSON.stringify({
+            visible
+        })
+    });
+}
+
 export function patchComment({comment_id, editorContent}) {
     const token = window.localStorage.getItem(storageTokenKey);
     return request(`/api/comments/${comment_id}`, {
         method: 'PATCH',
         headers: new Headers({
             "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/x-www-form-urlencoded; charset=utf-8"
+            "Content-Type": "application/json; charset=utf-8"
         }),
-        body: stringify({
-            updatedContent: editorContent
+        body: JSON.stringify({
+            content: editorContent
         })
     });
 }
