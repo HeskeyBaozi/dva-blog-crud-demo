@@ -26,14 +26,13 @@ function PostList({
                 title,
                 visible
             } = record;
-
             return (
                 <Card>
                     <div className={styles.panelContainer}>
                         <PostPanel
                             visible={visible}
                             isSuper={author.ability === 'super'}
-                            onEdit={() => console.log('click Edit')}
+                            editPostId={post_id}
                             onDelete={() => dispatch({
                                 type: 'posts/deletePost', payload: {
                                     post_id, paging: {limit: paging.per_page, page: paging.page}
@@ -46,7 +45,7 @@ function PostList({
                         <span className={styles.commentNumber}>
                             <Link to={`/posts/${post_id}`}>
                                 {descendants.length}
-                                </Link>
+                            </Link>
                         </span>
                         <span>
                             <Link to={`/posts/${post_id}`}>

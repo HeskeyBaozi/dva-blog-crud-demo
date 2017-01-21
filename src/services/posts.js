@@ -48,6 +48,20 @@ export function createPost({title, content}) {
     });
 }
 
+export function patchPost({title, content, post_id}) {
+    const token = window.localStorage.getItem(storageTokenKey);
+    return request(`/api/posts/${post_id}`, {
+        method: 'PATCH',
+        headers: new Headers({
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json; charset=utf-8"
+        }),
+        body: JSON.stringify({
+            title, content
+        })
+    });
+}
+
 export function deletePost({post_id}) {
     const token = window.localStorage.getItem(storageTokenKey);
     return request(`/api/posts/${post_id}`, {

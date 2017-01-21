@@ -24,6 +24,18 @@ function RouterConfig({history, app}) {
         })
     }
 
+    function requireTypeOrPostId(nextState, replace, callback) {
+        if (nextState.location.query.post_id || nextState.location.query.type) {
+            app._store.dispatch({
+                type: 'posts/loadEditorInfo',
+                payload: {post_id: nextState.location.query.post_id},
+                onComplete: callback
+            });
+        } else {
+            replace('/posts');
+        }
+    }
+
     return (
         <Router history={history}>
             <Route path="/login" component={Login}/>
@@ -33,7 +45,7 @@ function RouterConfig({history, app}) {
                 <Route path="posts" breadcrumbName="Posts" component={PostList}/>
                 <Route path="posts/:post_id" breadcrumbName="Post Detail" onEnter={requirePrepared}
                        component={PostPage}/>
-                <Route path="editor" breadcrumbName="Editor" component={PostEditor}/>
+                <Route path="editor" breadcrumbName="Editor" component={PostEditor} onEnter={requireTypeOrPostId}/>
             </Route>
             <Route path="*" breadcrumbName="Not Found" component={props => <h1>Oops! Not Found</h1>}/>
         </Router>

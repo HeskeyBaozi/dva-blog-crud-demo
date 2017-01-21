@@ -1,11 +1,12 @@
 import React, {PropTypes} from 'react';
 import {Button, Popconfirm, Switch} from 'antd';
+import {Link} from 'dva/router';
 import styles from './PostPanel.css';
 
 
 function PostPanel({
     isSuper,
-    onEdit,
+    editPostId,
     onDelete,
     onChangeVisibility,
     visible
@@ -19,30 +20,28 @@ function PostPanel({
                           onChange={onChangeVisibility}/>
                 : null
         }
-        <Button.Group>
-            <Button size="small" type="ghost" icon="edit"
-                    onClick={onEdit}
-            >
+        <Link to={`/editor?post_id=${editPostId}`}>
+            <Button size="small" type="ghost" icon="edit">
                 Edit
             </Button>
-            <Popconfirm
-                title="Are you sure to delete this Post?"
-                onText="Yes, sure"
-                cancelText="Cancel"
-                onConfirm={onDelete}
-            >
-                <Button size="small" type="ghost" icon="delete">
-                    Delete
-                </Button>
-            </Popconfirm>
-        </Button.Group>
+        </Link>
+        <Popconfirm
+            title="Are you sure to delete this Post?"
+            onText="Yes, sure"
+            cancelText="Cancel"
+            onConfirm={onDelete}
+        >
+            <Button size="small" type="ghost" icon="delete">
+                Delete
+            </Button>
+        </Popconfirm>
     </div>);
 }
 
 PostPanel.propTypes = {
     isSuper: PropTypes.bool.isRequired,
     visible: PropTypes.bool.isRequired,
-    onEdit: PropTypes.func.isRequired,
+    editPostId: PropTypes.string.isRequired,
     onDelete: PropTypes.func.isRequired,
     onChangeVisibility: PropTypes.func.isRequired
 
