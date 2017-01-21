@@ -13,7 +13,8 @@ function PostEditor({
         getFieldValue
     },
     dispatch,
-    isCreator
+    isCreator,
+    loading
 }) {
 
     function handleSubmit(e) {
@@ -81,8 +82,11 @@ function PostEditor({
                 <Form.Item>
                     <Button.Group className={styles.group}>
                         <Button type="ghost" onClick={() => dispatch(routerRedux.goBack())}>Back</Button>
-                        <Button icon={isCreator ? 'plus-square-o' : 'edit'} htmlType="submit"
-                                type="primary">{isCreator ? 'Create' : 'Edit'}</Button>
+                        <Button icon={isCreator ? 'plus-square-o' : 'edit'}
+                                htmlType="submit"
+                                type="primary"
+                                loading={loading}
+                        >{isCreator ? 'Create' : 'Edit'}</Button>
                     </Button.Group>
                 </Form.Item>
             </Row>
@@ -97,7 +101,8 @@ PostEditor.propTypes = {
 
 function mapStateToProps(state, ownProps) {
     return {
-        isCreator: ownProps.location.query.type === 'creator'
+        isCreator: ownProps.location.query.type === 'creator',
+        loading: state.loading.effects['posts/createNewPost']
     };
 }
 

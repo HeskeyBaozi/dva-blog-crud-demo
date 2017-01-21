@@ -1,12 +1,14 @@
 import pathToRegExp from 'path-to-regexp';
-import {message, Modal} from 'antd';
+import {message} from 'antd';
+import {routerRedux} from 'dva/router';
 
 import {
     fetchPosts,
     fetchContent,
     fetchComments,
     createPost,
-    fetchPostInfo
+    fetchPostInfo,
+    deletePost
 } from '../services/posts';
 import {
     createComment,
@@ -24,9 +26,9 @@ export default {
         current: {
             post: {
                 post_id: null,
-                author: null,
+                author: {},
                 title: null,
-                visible: null,
+                visible: false,
                 created_at: null,
                 descendants: [],
                 content: null
@@ -110,14 +112,18 @@ export default {
 
             if (data) {
                 const {post_id} = data;
-                Modal.success({
-                    title: 'Success',
-                    content: 'Post created/edit finished. :)'
-                });
+                message.success('create post successfully :)');
+                yield put(routerRedux.push(`/posts/${post_id}`));
             }
         },
+        deletePost: function *({payload}, {call, put}) {
+            const {post_id, paging} = payload;
+            yield call(deletePost, {post_id});
+            yield put({type: 'fetchPostsList', payload: {pageInfo: paging}});
+            message.success('delete post successfully. :)');
+        },
         createNewComment: function*({payload}, {call, put, select}) {
-            const post_id = yield select(state => state.posts.current.post_id);
+            const post_id = yield select(state => state.posts.current.post.post_id);
             const {commentInput} = payload;
             const {data:newComment} = yield call(createComment, {commentInput, post_id});
             if (newComment) {
@@ -171,9 +177,9 @@ export default {
                     post: {
                         ...state.current.post,
                         post_id: null,
-                        author: null,
+                        author: {},
                         title: null,
-                        visible: null,
+                        visible: false,
                         created_at: null,
                         descendants: [],
                         content: null
@@ -299,6 +305,22 @@ export default {
                     isEditing: false
                 }
             }
+        },
+        deletePostSuccess: function (state, {payload}) {
+            const {post_id} = payload;
+            const list = state.postsList.filter(post => post.post_id !== post_id);
+            const posts = list.reduce((memo, post) => {
+                memo[post.post_id] = post;
+                return memo;
+            }, {});
+            return {
+                ...state,
+                postsList: list,
+                postsById: {
+                    ...state.postsById,
+                    posts
+                }
+            };
         }
     }
 }

@@ -23,3 +23,9 @@
 .icon {
     margin-right: 8px;
 }
+
+.panelContainer {
+    float: right;
+    height: 50px;
+    display: flex;
+}

@@ -3,6 +3,7 @@ import {connect} from 'dva';
 import {Link} from 'dva/router';
 import styles from './PostList.css';
 import {Table, Card, Button, Icon} from 'antd';
+import PostPanel from '../../components/PostPanel/PostPanel';
 import moment from 'moment';
 
 const {Column} = Table;
@@ -22,20 +23,40 @@ function PostList({
                 descendants,
                 author,
                 created_at,
-                title
+                title,
+                visible
             } = record;
 
-            return (<Link to={`/posts/${post_id}`}>
+            return (
                 <Card>
+                    <div className={styles.panelContainer}>
+                        <PostPanel
+                            visible={visible}
+                            isSuper={author.ability === 'super'}
+                            onEdit={() => console.log('click Edit')}
+                            onDelete={() => dispatch({
+                                type: 'posts/deletePost', payload: {
+                                    post_id, paging: {limit: paging.per_page, page: paging.page}
+                                }
+                            })}
+                            onChangeVisibility={checked => console.log(checked)}
+                        />
+                    </div>
                     <div className={styles.cardContent}>
-                        <span className={styles.commentNumber}>{descendants.length}</span>
+                        <span className={styles.commentNumber}>
+                            <Link to={`/posts/${post_id}`}>
+                                {descendants.length}
+                                </Link>
+                        </span>
                         <span>
+                            <Link to={`/posts/${post_id}`}>
                             <h3>{title}</h3>
                             <p>By <em>{author.username}</em> | {moment(created_at).fromNow()}</p>
+                            </Link>
                         </span>
                     </div>
                 </Card>
-            </Link>);
+            );
         }
     };
 
@@ -50,7 +71,7 @@ function PostList({
                 type: 'posts/fetchPostsList',
                 payload: {
                     pageInfo: {
-                        limit: 5,
+                        limit: paging.per_page,
                         page: nextPage
                     }
                 }

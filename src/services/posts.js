@@ -48,6 +48,16 @@ export function createPost({title, content}) {
     });
 }
 
+export function deletePost({post_id}) {
+    const token = window.localStorage.getItem(storageTokenKey);
+    return request(`/api/posts/${post_id}`, {
+        method: 'DELETE',
+        headers: new Headers({
+            "Authorization": `Bearer ${token}`,
+        })
+    });
+}
+
 export function fetchPostInfo({post_id}) {
     const token = window.localStorage.getItem(storageTokenKey);
     return request(`/api/posts/${post_id}`, {
