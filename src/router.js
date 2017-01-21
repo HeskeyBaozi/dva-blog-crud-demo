@@ -25,12 +25,17 @@ function RouterConfig({history, app}) {
     }
 
     function requireTypeOrPostId(nextState, replace, callback) {
-        if (nextState.location.query.post_id || nextState.location.query.type) {
-            app._store.dispatch({
-                type: 'posts/loadEditorInfo',
-                payload: {post_id: nextState.location.query.post_id},
-                onComplete: callback
-            });
+        const post_id = nextState.location.query.post_id;
+        console.log(post_id, 'post_id');
+        console.log(nextState.location);
+        if (post_id || nextState.location.query.type) {
+            if (post_id)
+                app._store.dispatch({
+                    type: 'posts/loadEditorInfo',
+                    payload: {post_id: nextState.location.query.post_id},
+                    onComplete: callback
+                });
+            else callback();
         } else {
             replace('/posts');
         }

@@ -56,7 +56,7 @@ function PostEditor({
 
             </h1>
         </div>
-        <Spin spinning={loadingEditorContent} tip="Loading Editor...">
+        <Spin spinning={isCreator ? false : loadingEditorContent} tip="Loading Editor...">
             <Form className={styles.wrapper} onSubmit={handleSubmit}>
                 <Row>
                     <Col span={11}>

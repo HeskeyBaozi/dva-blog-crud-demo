@@ -2,19 +2,22 @@ import React from 'react';
 import styles from './Register.css';
 import {Link} from 'dva/router';
 import LoginLayout from '../../components/LoginLayout/LoginLayout';
-
+import {connect} from 'dva';
 import {Form, Input, Button, Icon} from 'antd';
 
 
-function Register({form}) {
+function Register({form, dispatch}) {
     let passwordDirty = false;
     const getFieldDecorator = form.getFieldDecorator;
 
     function handleSubmit(e) {
         e.preventDefault();
-        form.validateFieldsAndScroll((error, values) => {
+        form.validateFieldsAndScroll((error, {username, email, password}) => {
             if (!error) {
-                console.log('Received values of form: ', values);
+                dispatch({
+                    type: 'app/register',
+                    payload: {username, email, password}
+                });
             }
         });
     }
@@ -63,7 +66,7 @@ function Register({form}) {
                         hasFeedback
                     >
                         {
-                            getFieldDecorator('userName', {
+                            getFieldDecorator('username', {
                                 rules: [
                                     {
                                         required: true,
@@ -137,4 +140,4 @@ function Register({form}) {
     );
 }
 
-export default Form.create()(Register);
+export default connect(() => ({}))(Form.create()(Register));

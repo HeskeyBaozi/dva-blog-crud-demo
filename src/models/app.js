@@ -1,6 +1,10 @@
 'use strict';
 
-import {auth, fetchUser} from '../services/app';
+import {
+    auth,
+    fetchUser
+} from '../services/app';
+import {createUser} from '../services/user';
 import {routerRedux} from 'dva/router';
 import {storageTokenKey} from '../utils/constant';
 import {message} from 'antd';
@@ -57,6 +61,7 @@ export default {
         logout: function *({payload}, {put}) {
             yield put({type: 'authFail'});
             window.localStorage.removeItem(storageTokenKey);
+            message.success('Log out successfully :)');
             yield put(routerRedux.push('/login'));
         },
         queryUser: function *({payload}, {put, call}) {
@@ -64,10 +69,18 @@ export default {
             if (data) {
                 yield put({
                     type: 'queryUserSuccess',
-                    payload: {
-                        account: data
-                    }
-                })
+                    payload: {account: data}
+                });
+            }
+        },
+        register: function *({payload}, {put, call}) {
+            const {username, email, password} = payload;
+            const {data} = yield call(createUser, {username, email, password});
+            if (data) {
+                yield put({
+                    type: 'auth',
+                    payload: {username, password}
+                });
             }
         }
     },
