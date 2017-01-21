@@ -6,6 +6,7 @@ import styles from './PostPanel.css';
 
 function PostPanel({
     isSuper,
+    isSelf,
     editPostId,
     onDelete,
     onChangeVisibility,
@@ -20,26 +21,33 @@ function PostPanel({
                           onChange={onChangeVisibility}/>
                 : null
         }
-        <Link to={`/editor?post_id=${editPostId}`}>
-            <Button size="small" type="ghost" icon="edit">
-                Edit
-            </Button>
-        </Link>
-        <Popconfirm
-            title="Are you sure to delete this Post?"
-            onText="Yes, sure"
-            cancelText="Cancel"
-            onConfirm={onDelete}
-        >
-            <Button size="small" type="ghost" icon="delete">
-                Delete
-            </Button>
-        </Popconfirm>
+        {
+            isSelf
+                ? <div>
+                    <Link to={`/editor?post_id=${editPostId}`}>
+                        <Button size="small" type="ghost" icon="edit">
+                            Edit
+                        </Button>
+                    </Link>
+                    <Popconfirm
+                        title="Are you sure to delete this Post?"
+                        onText="Yes, sure"
+                        cancelText="Cancel"
+                        onConfirm={onDelete}
+                    >
+                        <Button size="small" type="ghost" icon="delete">
+                            Delete
+                        </Button>
+                    </Popconfirm>
+                </div>
+                : null
+        }
     </div>);
 }
 
 PostPanel.propTypes = {
     isSuper: PropTypes.bool.isRequired,
+    isSelf: PropTypes.bool.isRequired,
     visible: PropTypes.bool.isRequired,
     editPostId: PropTypes.string.isRequired,
     onDelete: PropTypes.func.isRequired,

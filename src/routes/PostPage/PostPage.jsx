@@ -16,28 +16,26 @@ function PostPage({
     },
     loading,
     dispatch,
-    account:{user_id}
+    account
 }) {
-    const postContentProps = {
-        loading: loading.content,
-        visible,
-        content: content || 'Loading...'
-    };
-
     const commentsReady = descendants.length && descendants[0].comment_id;
     const commentsListProps = {
         loadingComments: loading.comments,
         loadingPatch: loading.patchComment,
         dispatch,
         descendants: commentsReady ? descendants : [], // coming from state.posts.current.descendants...
-        user_id,
+        currentAccount: account
 
     };
     return (
         <div>
             <h1 className={styles.title}>{title}</h1>
             <p className={styles.leading}>By <em>{author.username}</em>, {moment(created_at).fromNow()}</p>
-            <PostContent {...postContentProps}/>
+            <PostContent
+                loading={loading.content}
+                visible={visible}
+                content={content || 'Loading...'}
+            />
             <CommentsList {...commentsListProps}/>
         </div>
     );

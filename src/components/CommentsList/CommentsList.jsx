@@ -1,16 +1,16 @@
 import React, {PropTypes} from 'react';
-import {Table, Icon, Button, Popconfirm} from 'antd';
+import {Table, Icon} from 'antd';
 import Publish from '../CommentsPublish/CommentsPublish';
 import styles from './CommentsList.css';
 import moment from 'moment';
-import Editor from '../Editor/Editor';
+import CommentPanel from '../CommentPanel/CommentPanel';
 const {Column} = Table;
 
 function CommentsList({
     descendants,
     loadingComments,
     loadingPatch,
-    user_id,
+    currentAccount,
     dispatch
 }) {
 
@@ -26,50 +26,29 @@ function CommentsList({
                 comment_id,
             } = record;
 
-
-            const editorProps = {
-                initialValue: content,
-                loading: loadingPatch,
-                commit: ({editorContent, onComplete}) => dispatch({
-                    type: 'posts/patchComment',
-                    payload: {editorContent, comment_id},
-                    onComplete
-                })
-            };
-
-            const popConfirmProps = {
-                title: 'Are you sure to delete this comment?',
-                okText: 'Yes, sure',
-                cancelText: 'Cancel',
-                onConfirm() {
-                    dispatch({
-                        type: 'posts/deleteComment',
-                        payload: {comment_id}
-                    });
-                }
-            };
-
             return (
                 <div>
                     <div className={styles.content}>{visible ? content : 'can not see'}</div>
                     <p className={styles.meta}>
-                        By <em>{author.username}</em>, {moment(created_at).fromNow()}
+                        by <em>{author.username}</em>, {moment(created_at).fromNow()}
                     </p>
-                    {
-                        user_id === author.user_id ?
-                            <Button.Group className={styles.panel}>
-                                <Editor {...editorProps}>
-                                    <Button size="small" type="ghost" icon="edit">
-                                        Edit
-                                    </Button>
-                                </Editor>
-                                <Popconfirm {...popConfirmProps}>
-                                    <Button size="small" type="ghost" icon="delete">
-                                        Delete
-                                    </Button>
-                                </Popconfirm>
-                            </Button.Group> : null
-                    }
+                    <CommentPanel
+                        isSelf={currentAccount.user_id === author.user_id}
+                        isSuper={currentAccount.ability === 'super'}
+                        visible={visible}
+                        commit={({editorContent, onComplete}) => dispatch({
+                            type: 'posts/patchComment',
+                            payload: {editorContent, comment_id},
+                            onComplete
+                        })}
+                        initialValue={visible ? content : ''}
+                        onDelete={() => dispatch({
+                            type: 'posts/deleteComment',
+                            payload: {comment_id}
+                        })}
+                        onChangeVisibility={visible => console.log(visible)}
+                        patchLoading={loadingPatch}
+                    />
                 </div>
             );
         }
@@ -83,7 +62,7 @@ function CommentsList({
                 size="small"
                 showHeader={false}
                 dataSource={descendants}
-                title={() => <h2><Icon type="message" className={styles.icon}/>Comments</h2>}
+                title={() => <h2><Icon type="message" className={styles.icon}/>{descendants.length} Comment(s)</h2>}
             >
                 <Column {...columnProps}/>
             </Table>
@@ -102,7 +81,7 @@ function CommentsList({
 
 CommentsList.propTypes = {
     descendants: PropTypes.array.isRequired,
-    user_id: PropTypes.string.isRequired,
+    currentAccount: PropTypes.object.isRequired,
     dispatch: PropTypes.func.isRequired
 };
 

@@ -29,3 +29,7 @@
     height: 50px;
     display: flex;
 }
+
+.tagGroup {
+    margin-left: 12px;
+}

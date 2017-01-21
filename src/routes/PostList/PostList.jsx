@@ -2,7 +2,7 @@ import React, {PropTypes} from 'react';
 import {connect} from 'dva';
 import {Link} from 'dva/router';
 import styles from './PostList.css';
-import {Table, Card, Button, Icon} from 'antd';
+import {Table, Card, Button, Tag, Icon, Tooltip} from 'antd';
 import PostPanel from '../../components/PostPanel/PostPanel';
 import moment from 'moment';
 
@@ -12,7 +12,8 @@ function PostList({
     dispatch,
     postsList,
     paging,
-    loading
+    loading,
+    currentAccount
 }) {
     const columnProps = {
         title: 'posts',
@@ -31,14 +32,22 @@ function PostList({
                     <div className={styles.panelContainer}>
                         <PostPanel
                             visible={visible}
-                            isSuper={author.ability === 'super'}
+                            isSuper={currentAccount.ability === 'super'}
+                            isSelf={currentAccount.user_id === author.user_id}
                             editPostId={post_id}
                             onDelete={() => dispatch({
-                                type: 'posts/deletePost', payload: {
+                                type: 'posts/deletePost',
+                                payload: {
                                     post_id, paging: {limit: paging.per_page, page: paging.page}
                                 }
                             })}
-                            onChangeVisibility={checked => console.log(checked)}
+                            onChangeVisibility={checked => dispatch({
+                                type: 'posts/setPostVisibility',
+                                payload: {
+                                    visible: !visible,
+                                    post_id
+                                }
+                            })}
                         />
                     </div>
                     <div className={styles.cardContent}>
@@ -53,6 +62,18 @@ function PostList({
                             <p>By <em>{author.username}</em> | {moment(created_at).fromNow()}</p>
                             </Link>
                         </span>
+                        <Link to={`/posts/${post_id}`}>
+                            <div className={styles.tagGroup}>
+                                {
+                                    visible
+                                        ? null
+                                        : <Tooltip title="The Post has been hidden by the Super Admin..."
+                                                   placement="topLeft">
+                                            <Tag color="#FFC100">Hidden</Tag>
+                                        </Tooltip>
+                                }
+                            </div>
+                        </Link>
                     </div>
                 </Card>
             );
@@ -120,7 +141,8 @@ function mapStateToProps(state) {
     return {
         postsList: state.posts.postsList,
         paging: state.posts.paging,
-        loading: state.loading.effects['posts/fetchPostsList']
+        loading: state.loading.effects['posts/fetchPostsList'],
+        currentAccount: state.app.account
     };
 }
 

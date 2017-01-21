@@ -53,7 +53,7 @@ class Editor extends React.Component {
                                 loading={this.props.loading}
                         >Patch</Button>
                     </Button.Group>
-                    <h3>Editor</h3>
+                    <h3>Edit the Comment</h3>
                 </div>}
                 trigger="click"
                 placement="topRight"

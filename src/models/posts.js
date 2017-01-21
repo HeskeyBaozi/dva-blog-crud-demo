@@ -9,7 +9,8 @@ import {
     createPost,
     fetchPostInfo,
     deletePost,
-    patchPost
+    patchPost,
+    setVisibilityOfPost
 } from '../services/posts';
 import {
     createComment,
@@ -23,7 +24,6 @@ export default {
     state: {
         postsList: [],
         paging: {},
-        postsById: {},
         current: {
             post: {
                 post_id: null,
@@ -86,10 +86,15 @@ export default {
                     payload: {postInfo: data}
                 });
                 onComplete();
-                yield [
-                    put({type: 'fetchPostContent'}),
-                    put({type: 'fetchPostComments'})
-                ];
+                if (data.visible) {
+                    yield [
+                        put({type: 'fetchPostContent'}),
+                        put({type: 'fetchPostComments'})
+                    ];
+                } else {
+                    yield put({type: 'fetchPostComments'});
+                }
+
             }
         },
         fetchPostContent: function*({payload}, {call, put, select}) {
@@ -146,7 +151,15 @@ export default {
                 yield put(routerRedux.push(`/posts/${post_id}`));
             }
         },
-        createNewPost: function*({payload}, {call, put, take}) {
+        setPostVisibility: function*({payload}, {call, put}) {
+            const {visible, post_id} = payload;
+            const {data:updatedPost} = yield call(setVisibilityOfPost, {visible, post_id});
+            if (updatedPost) {
+                yield put({type: 'savePostVisibility', payload: {updatedPost}});
+                message.success('set Visibility successfully :)');
+            }
+        },
+        createNewPost: function*({payload}, {call, put}) {
             const {title, content} = payload;
             const {data} = yield call(createPost, {title, content});
 
@@ -197,17 +210,10 @@ export default {
     reducers: {
         savePostsList: function (state, {payload}) {
             const {paging, data:list} = payload;
-
-            const posts = list.reduce((memo, post) => {
-                memo[post.post_id] = post;
-                return memo;
-            }, {});
-
             return {
                 ...state,
                 paging,
-                postsList: list,
-                postsById: {...state.postsById, ...posts}
+                postsList: list
             };
         },
         clearCurrentPostInfo: function (state, {payload}) {
@@ -282,16 +288,8 @@ export default {
         },
         removeComment: function (state, {payload}) {
             const {comment_id, ascendant} = payload;
-            const currentPost = state.postsById[ascendant];
             return {
                 ...state,
-                postsById: {
-                    ...state.postsById,
-                    [ascendant]: {
-                        ...currentPost,
-                        descendants: currentPost.descendants.filter(comment => comment !== comment_id)
-                    }
-                },
                 current: {
                     ...state.current,
                     post: {
@@ -322,17 +320,9 @@ export default {
         deletePostSuccess: function (state, {payload}) {
             const {post_id} = payload;
             const list = state.postsList.filter(post => post.post_id !== post_id);
-            const posts = list.reduce((memo, post) => {
-                memo[post.post_id] = post;
-                return memo;
-            }, {});
             return {
                 ...state,
-                postsList: list,
-                postsById: {
-                    ...state.postsById,
-                    posts
-                }
+                postsList: list
             };
         },
         saveEditorInitialValue: function (state, {payload}) {
@@ -359,6 +349,16 @@ export default {
                         content
                     }
                 }
+            };
+        },
+        savePostVisibility: function (state, {payload}) {
+            const {updatedPost} = payload;
+            const {post_id} = updatedPost;
+            return {
+                ...state,
+                postsList: state.postsList.map(post => {
+                    return post_id === post.post_id ? updatedPost : post;
+                })
             };
         }
     }

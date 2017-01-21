@@ -8,19 +8,16 @@ function PostContent({
     visible,
     loading
 }) {
-    const alertProps = {
-        message: 'this post was hidden by the super admin..',
-        type: 'warning',
-        showIcon: true
-    };
-
     return (
-        <Spin spinning={loading}>
+        <Spin spinning={!!loading}>
             <div className={styles.content}>
                 {
                     visible
                         ? <div dangerouslySetInnerHTML={{__html: marked(content)}}/>
-                        : <Alert {...alertProps}/>
+                        : <Alert
+                            message="this post was hidden by the super admin.."
+                            type="warning"
+                            showIcon/>
                 }
             </div>
         </Spin>
