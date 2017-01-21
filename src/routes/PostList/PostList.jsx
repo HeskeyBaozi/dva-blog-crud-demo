@@ -4,6 +4,7 @@ import {Link} from 'dva/router';
 import styles from './PostList.css';
 import {Table, Card, Button, Tag, Icon, Tooltip, Spin, Input} from 'antd';
 import PostPanel from '../../components/PostPanel/PostPanel';
+import SearchKeyword from '../../components/SearchKeyword/SearchKeyword';
 import moment from 'moment';
 
 const {Column} = Table;
@@ -119,14 +120,12 @@ function PostList({
         rowKey: 'post_id',
         pagination,
         loading,
-        title: () => <Input.Search placeholder="Search Post By Title."
-                                   onSearch={keyword => dispatch({
-                                       type: 'posts/fetchPostsList',
-                                       payload: {
-                                           pageInfo: {limit: paging.per_page, page: paging.page},
-                                           keyword
-                                       }
-                                   })}/>
+        title: () => <SearchKeyword
+            onSearch={keyword => dispatch({
+                type: 'posts/fetchPostsList',
+                payload: {pageInfo: {limit: paging.per_page, page: paging.page}, keyword}
+            })}
+        />
     };
 
     return (
