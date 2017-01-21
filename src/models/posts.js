@@ -32,8 +32,7 @@ export default {
                 created_at: null,
                 descendants: [],
                 content: null
-            },
-            isEditing: false
+            }
         }
     },
     subscriptions: {
@@ -144,11 +143,12 @@ export default {
             });
             message.success('Delete comment successfully. :)');
         },
-        patchComment: function *({payload}, {call, put, select}) {
+        patchComment: function *({payload, onComplete}, {call, put, select}) {
             const {comment_id, editorContent} = payload;
             const {data} = yield call(patchComment, {comment_id, editorContent});
             if (data) {
                 yield put({type: 'saveUpdatedComment', payload: {updatedComment: data}});
+                onComplete();
                 message.success('Update comment successfully. :)');
             }
         }
@@ -183,8 +183,7 @@ export default {
                         created_at: null,
                         descendants: [],
                         content: null
-                    },
-                    isEditing: false
+                    }
                 }
             };
         },
@@ -261,24 +260,6 @@ export default {
                 }
             };
         },
-        showEditor: function (state) {
-            return {
-                ...state,
-                current: {
-                    ...state.current,
-                    isEditing: true
-                }
-            };
-        },
-        closeEditor: function (state) {
-            return {
-                ...state,
-                current: {
-                    ...state.current,
-                    isEditing: false
-                }
-            };
-        },
         saveUpdatedComment: function (state, {payload}) {
             const {updatedComment} = payload;
             return {
@@ -293,8 +274,7 @@ export default {
                             }
                             return comment;
                         })
-                    },
-                    isEditing: false
+                    }
                 }
             }
         },

@@ -16,7 +16,6 @@ function PostPage({
     },
     loading,
     dispatch,
-    isEditing,
     account:{user_id}
 }) {
     const postContentProps = {
@@ -29,7 +28,6 @@ function PostPage({
     const commentsListProps = {
         loadingComments: loading.comments,
         loadingPatch: loading.patchComment,
-        isEditing,
         dispatch,
         descendants: commentsReady ? descendants : [], // coming from state.posts.current.descendants...
         user_id,
@@ -49,14 +47,12 @@ PostPage.propTypes = {
     currentPost: PropTypes.object.isRequired,
     dispatch: PropTypes.func.isRequired,
     account: PropTypes.object.isRequired,
-    isEditing: PropTypes.bool.isRequired
 };
 
 function mapStateToProps(state, ownProps) {
     return {
         post_id: ownProps.params.post_id,
         currentPost: state.posts.current.post,
-        isEditing: state.posts.current.isEditing,
         loading: {
             content: state.loading.effects['posts/fetchPostContent'],
             comments: state.loading.effects['posts/fetchPostComments'],

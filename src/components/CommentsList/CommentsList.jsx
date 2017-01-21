@@ -11,7 +11,6 @@ function CommentsList({
     loadingComments,
     loadingPatch,
     user_id,
-    isEditing,
     dispatch
 }) {
 
@@ -29,13 +28,12 @@ function CommentsList({
 
 
             const editorProps = {
-                visible: isEditing,
                 initialValue: content,
                 loading: loadingPatch,
-                onClose: () => dispatch({type: 'posts/closeEditor'}),
-                commit: ({editorContent}) => dispatch({
+                commit: ({editorContent, onComplete}) => dispatch({
                     type: 'posts/patchComment',
-                    payload: {editorContent, comment_id}
+                    payload: {editorContent, comment_id},
+                    onComplete
                 })
             };
 
@@ -60,14 +58,11 @@ function CommentsList({
                     {
                         user_id === author.user_id ?
                             <Button.Group className={styles.panel}>
-                                <Button size="small"
-                                        type="ghost"
-                                        icon="edit"
-                                        onClick={() => dispatch({type: 'posts/showEditor'})}
-                                >
-                                    Edit
-                                </Button>
-                                <Editor {...editorProps}/>
+                                <Editor {...editorProps}>
+                                    <Button size="small" type="ghost" icon="edit">
+                                        Edit
+                                    </Button>
+                                </Editor>
                                 <Popconfirm {...popConfirmProps}>
                                     <Button size="small" type="ghost" icon="delete">
                                         Delete
@@ -108,7 +103,6 @@ function CommentsList({
 CommentsList.propTypes = {
     descendants: PropTypes.array.isRequired,
     user_id: PropTypes.string.isRequired,
-    isEditing: PropTypes.bool.isRequired,
     dispatch: PropTypes.func.isRequired
 };
 
