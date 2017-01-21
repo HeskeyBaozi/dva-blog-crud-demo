@@ -76,7 +76,9 @@ function PostList({
         pagination,
         loading,
         title: () => <div>
-            <Button type="primary" size="large" icon="addfile" className={styles.addPost}>Add Post</Button>
+            <Link to="/editor?type=creator">
+                <Button type="primary" size="large" icon="addfile" className={styles.addPost}>Add Post</Button>
+            </Link>
             <h1><Icon type="file-text" className={styles.icon}/>Posts</h1>
         </div>
     };

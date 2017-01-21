@@ -16,22 +16,8 @@ export default {
             email: null
         }
     },
-    subscriptions: {
-        setup: function ({history, dispatch}) {
-            history.listen(location => {
-                if (!['/login', '/register'].includes(location.pathname)) {
-                    dispatch({type: 'checkToken'});
-                }
-            });
-        }
-    },
+    subscriptions: {},
     effects: {
-        /**
-         * fetch token and save in local storage.
-         * @param payload
-         * @param call
-         * @param put
-         */
         auth: function *({payload}, {call, put}) {
             const {username, password} = payload;
             try {
@@ -54,39 +40,25 @@ export default {
                 message.error('Wrong Username or Password.. :(', 4);
             }
         },
-        /**
-         * check the local storage whether has token
-         * @param payload
-         * @param put
-         * @param call
-         * @param select
-         */
+        enterAuth: function*({payload, onComplete}, {put, take}) {
+            yield [put({type: 'checkToken'}), put({type: 'queryUser'})];
+            yield [take('app/hasToken'), take('app/queryUserSuccess')];
+            onComplete();
+        },
         checkToken: function*({payload}, {put, call, select}) {
             // get the token from local storage.
             const token = window.localStorage.getItem(storageTokenKey);
             if (token) {
                 yield put({type: 'hasToken'});
-                yield put({type: 'queryUser'});
             } else {
                 yield put({type: 'authFail'});
             }
         },
-        /**
-         * log out and remove the token
-         * @param payload
-         * @param put
-         */
         logout: function *({payload}, {put}) {
             yield put({type: 'authFail'});
             window.localStorage.removeItem(storageTokenKey);
             yield put(routerRedux.push('/login'));
         },
-        /**
-         * fetch user information according the token.
-         * @param payload
-         * @param put
-         * @param call
-         */
         queryUser: function *({payload}, {put, call}) {
             const {data} = yield call(fetchUser);
             if (data) {

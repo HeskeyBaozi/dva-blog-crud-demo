@@ -1,13 +1,19 @@
+import pathToRegExp from 'path-to-regexp';
+import {message, Modal} from 'antd';
+
 import {
     fetchPosts,
     fetchContent,
     fetchComments,
+    createPost,
+    fetchPostInfo
+} from '../services/posts';
+import {
     createComment,
     deleteComment,
     patchComment
-} from '../services/posts';
-import pathToRegExp from 'path-to-regexp';
-import {message} from 'antd';
+} from '../services/comments';
+
 
 export default {
     namespace: 'posts',
@@ -31,7 +37,7 @@ export default {
     subscriptions: {
         setup: function ({history, dispatch}) {
             history.listen(location => {
-                if (['/posts'].includes(location.pathname)) {
+                if (pathToRegExp('/posts').exec(location.pathname)) {
                     dispatch({
                         type: 'fetchPostsList',
                         payload: {
@@ -40,15 +46,6 @@ export default {
                                 page: 1
                             }
                         }
-                    });
-                }
-
-                const match = pathToRegExp('/posts/:post_id').exec(location.pathname);
-                if (match) {
-                    const post_id = match[1];
-                    dispatch({
-                        type: 'displayPost',
-                        payload: {post_id}
                     });
                 }
             });
@@ -66,21 +63,23 @@ export default {
                 });
             }
         },
-        displayPost: function*({payload}, {put}) {
+        displayPost: function*({payload, onComplete}, {put, call, select}) {
             yield put({
                 type: 'clearCurrentPostInfo'
             });
             const {post_id} = payload;
-            yield put({
-                type: 'saveCurrentPostInfo',
-                payload: {post_id}
-            });
-
-            yield [
-                put({type: 'fetchPostContent'}),
-                put({type: 'fetchPostComments'})
-            ];
-
+            const {data} = yield call(fetchPostInfo, {post_id});
+            if (data) {
+                yield put({
+                    type: 'saveCurrentPostInfo',
+                    payload: {postInfo: data}
+                });
+                onComplete();
+                yield [
+                    put({type: 'fetchPostContent'}),
+                    put({type: 'fetchPostComments'})
+                ];
+            }
         },
         fetchPostContent: function*({payload}, {call, put, select}) {
             const post_id = yield select(state => state.posts.current.post.post_id);
@@ -102,6 +101,18 @@ export default {
                 yield put({
                     type: 'saveComments',
                     payload: {descendants}
+                });
+            }
+        },
+        createNewPost: function*({payload}, {call, put, take}) {
+            const {title, content} = payload;
+            const {data} = yield call(createPost, {title, content});
+
+            if (data) {
+                const {post_id} = data;
+                Modal.success({
+                    title: 'Success',
+                    content: 'Post created/edit finished. :)'
                 });
             }
         },
@@ -172,14 +183,14 @@ export default {
             };
         },
         saveCurrentPostInfo: function (state, {payload}) {
-            const {post_id} = payload;
+            const {postInfo} = payload;
             return {
                 ...state,
                 current: {
                     ...state.current,
                     post: {
                         ...state.current.post,
-                        ...state.postsById[post_id]
+                        ...postInfo
                     }
                 }
             };

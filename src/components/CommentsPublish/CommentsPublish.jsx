@@ -62,7 +62,6 @@ function CommentsPublish({
 
 CommentsPublish.propTypes = {
     form: PropTypes.object.isRequired,
-    loading: PropTypes.bool.isRequired,
     commit: PropTypes.func.isRequired
 };
 

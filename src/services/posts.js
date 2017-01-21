@@ -34,41 +34,27 @@ export function fetchComments({post_id}) {
     });
 }
 
-export function createComment({post_id, commentInput}) {
+export function createPost({title, content}) {
     const token = window.localStorage.getItem(storageTokenKey);
-    return request(`/api/comments?${stringify({post_id})}`, {
-        method: 'post',
+    return request('/api/posts', {
+        method: 'POST',
         headers: new Headers({
             "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/x-www-form-urlencoded; charset=utf-8"
+            "Content-Type": "application/json; charset=utf-8"
         }),
-        body: stringify({
-            post_id,
-            content: commentInput
+        body: JSON.stringify({
+            title, content
         })
     });
 }
 
-export function deleteComment({comment_id}) {
+export function fetchPostInfo({post_id}) {
     const token = window.localStorage.getItem(storageTokenKey);
-    return request(`/api/comments/${comment_id}`, {
-        method: 'delete',
+    return request(`/api/posts/${post_id}`, {
+        method: 'GET',
         headers: new Headers({
-            "Authorization": `Bearer ${token}`
+            "Authorization": `Bearer ${token}`,
         })
     });
 }
 
-export function patchComment({comment_id, editorContent}) {
-    const token = window.localStorage.getItem(storageTokenKey);
-    return request(`/api/comments/${comment_id}`, {
-        method: 'PATCH',
-        headers: new Headers({
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/x-www-form-urlencoded; charset=utf-8"
-        }),
-        body: stringify({
-            updatedContent: editorContent
-        })
-    });
-}

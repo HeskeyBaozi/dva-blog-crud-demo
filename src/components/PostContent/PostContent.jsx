@@ -29,8 +29,7 @@ function PostContent({
 
 PostContent.propTypes = {
     visible: PropTypes.bool.isRequired,
-    content: PropTypes.string.isRequired,
-    loading: PropTypes.bool.isRequired
+    content: PropTypes.string.isRequired
 };
 
 export default PostContent;

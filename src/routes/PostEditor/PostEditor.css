@@ -1,0 +1,22 @@
+.icon {
+    margin-right: 8px;
+}
+
+.title {
+    padding: 16px 8px;
+}
+
+.wrapper {
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+.group {
+    float: right;
+}
+
+.previewLeading {
+    padding-bottom: 16px;
+    margin-bottom: 13px;
+    border-bottom: 1px solid #dcdcdc;
+}

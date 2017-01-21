@@ -35,11 +35,12 @@ function PostPage({
         user_id,
 
     };
-
     return (
         <div>
             <h1 className={styles.title}>{title}</h1>
-            <p className={styles.leading}>By <em>{author.username}</em>, {moment(created_at).fromNow()}</p>
+            <p className={styles.leading}>By
+                <em>{author.username}</em>, {moment(created_at).fromNow()}
+            </p>
             <PostContent {...postContentProps}/>
             <CommentsList {...commentsListProps}/>
         </div>
@@ -55,11 +56,13 @@ PostPage.propTypes = {
 
 function mapStateToProps(state, ownProps) {
     return {
+        post_id: ownProps.params.post_id,
         currentPost: state.posts.current.post,
         isEditing: state.posts.current.isEditing,
         loading: {
             content: state.loading.effects['posts/fetchPostContent'],
             comments: state.loading.effects['posts/fetchPostComments'],
+            post: state.loading.effects['posts/displayPost'],
             patchComment: state.loading.effects['posts/patchComment']
         },
         account: state.app.account
