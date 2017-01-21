@@ -2,7 +2,7 @@ import React, {PropTypes} from 'react';
 import {connect} from 'dva';
 import {Link} from 'dva/router';
 import styles from './PostList.css';
-import {Table, Card, Button, Tag, Icon, Tooltip} from 'antd';
+import {Table, Card, Button, Tag, Icon, Tooltip, Spin} from 'antd';
 import PostPanel from '../../components/PostPanel/PostPanel';
 import moment from 'moment';
 
@@ -13,7 +13,8 @@ function PostList({
     postsList,
     paging,
     loading,
-    currentAccount
+    currentAccount,
+    loadVisible
 }) {
     const columnProps = {
         title: 'posts',
@@ -28,54 +29,56 @@ function PostList({
                 visible
             } = record;
             return (
-                <Card>
-                    <div className={styles.panelContainer}>
-                        <PostPanel
-                            visible={visible}
-                            isSuper={currentAccount.ability === 'super'}
-                            isSelf={currentAccount.user_id === author.user_id}
-                            editPostId={post_id}
-                            onDelete={() => dispatch({
-                                type: 'posts/deletePost',
-                                payload: {
-                                    post_id, paging: {limit: paging.per_page, page: paging.page}
-                                }
-                            })}
-                            onChangeVisibility={checked => dispatch({
-                                type: 'posts/setPostVisibility',
-                                payload: {
-                                    visible: !visible,
-                                    post_id
-                                }
-                            })}
-                        />
-                    </div>
-                    <div className={styles.cardContent}>
+                <Spin spinning={!!loadVisible} tip="Setting...">
+                    <Card>
+                        <div className={styles.panelContainer}>
+                            <PostPanel
+                                visible={visible}
+                                isSuper={currentAccount.ability === 'super'}
+                                isSelf={currentAccount.user_id === author.user_id}
+                                editPostId={post_id}
+                                onDelete={() => dispatch({
+                                    type: 'posts/deletePost',
+                                    payload: {
+                                        post_id, paging: {limit: paging.per_page, page: paging.page}
+                                    }
+                                })}
+                                onChangeVisibility={checked => dispatch({
+                                    type: 'posts/setPostVisibility',
+                                    payload: {
+                                        visible: !visible,
+                                        post_id
+                                    }
+                                })}
+                            />
+                        </div>
+                        <div className={styles.cardContent}>
                         <span className={styles.commentNumber}>
                             <Link to={`/posts/${post_id}`}>
                                 {descendants.length}
                             </Link>
                         </span>
-                        <span>
+                            <span>
                             <Link to={`/posts/${post_id}`}>
                             <h3>{title}</h3>
                             <p>By <em>{author.username}</em> | {moment(created_at).fromNow()}</p>
                             </Link>
                         </span>
-                        <Link to={`/posts/${post_id}`}>
-                            <div className={styles.tagGroup}>
-                                {
-                                    visible
-                                        ? null
-                                        : <Tooltip title="The Post has been hidden by the Super Admin..."
-                                                   placement="topLeft">
-                                            <Tag color="#FFC100">Hidden</Tag>
-                                        </Tooltip>
-                                }
-                            </div>
-                        </Link>
-                    </div>
-                </Card>
+                            <Link to={`/posts/${post_id}`}>
+                                <div className={styles.tagGroup}>
+                                    {
+                                        visible
+                                            ? null
+                                            : <Tooltip title="The Post has been hidden by the Super Admin..."
+                                                       placement="topLeft">
+                                                <Tag color="#FFC100">Hidden</Tag>
+                                            </Tooltip>
+                                    }
+                                </div>
+                            </Link>
+                        </div>
+                    </Card>
+                </Spin>
             );
         }
     };
@@ -142,6 +145,7 @@ function mapStateToProps(state) {
         postsList: state.posts.postsList,
         paging: state.posts.paging,
         loading: state.loading.effects['posts/fetchPostsList'],
+        loadVisible: state.loading.effects['posts/setPostVisibility'],
         currentAccount: state.app.account
     };
 }

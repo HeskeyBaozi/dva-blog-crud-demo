@@ -1,5 +1,5 @@
 import React, {PropTypes} from 'react';
-import {Layout, Menu, Breadcrumb, Icon} from 'antd';
+import {Layout, Menu, Breadcrumb, Icon, BackTop} from 'antd';
 import {Link} from 'dva/router';
 import LogoImg from '../../assets/dog_48px_1182381_easyicon.net.png';
 import styles from './MainLayout.less';
@@ -58,6 +58,7 @@ const MainLayout = ({
             <Footer className={styles.footer}>
                 Heskey Baozi, 15331097
             </Footer>
+            <BackTop className={styles.backTop} />
         </Layout>
     )
 };

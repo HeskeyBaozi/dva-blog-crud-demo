@@ -2,7 +2,7 @@ import React, {PropTypes} from 'react';
 import moment from 'moment';
 import {connect} from 'dva';
 import {Link} from 'dva/router';
-import {Button} from 'antd';
+import {Button, Switch, Spin} from 'antd';
 import PostContent from '../../components/PostContent/PostContent';
 import styles from './PostPage.css';
 import CommentsList from '../../components/CommentsList/CommentsList';
@@ -30,24 +30,50 @@ function PostPage({
         currentAccount: account
 
     };
+    const isSelf = author.user_id === account.user_id;
+    const isSuper = account.ability === 'super';
     return (
         <div>
             <div className={styles.header}>
-                {
-                    author.user_id === account.user_id
-                        ? <Link to={`/editor?post_id=${post_id}`}>
-                            <Button type="primary" size="large" icon="edit" className={styles.editPost}>Edit
-                                Post</Button>
-                        </Link>
-                        : null
-                }
+                <div className={styles.editPost}>
+                    {
+                        isSuper
+                            ? <Spin spinning={!!loading.setVisible}>
+                                <Switch checked={visible}
+                                        checkedChildren="visible"
+                                        unCheckedChildren="unvisible"
+                                        onChange={checked => dispatch({
+                                            type: 'posts/setPostVisibility',
+                                            payload: {
+                                                visible: !visible,
+                                                post_id
+                                            }
+                                        })}
+                                        className={styles.switch}/>
+                            </Spin>
+                            : null
+                    }
+                    {
+                        isSelf
+                            ?
+
+                            <Link to={`/editor?post_id=${post_id}`}>
+                                <Button type="primary" icon="edit">
+                                    Edit Post
+                                </Button>
+                            </Link>
+                            : null
+                    }
+                </div>
                 <h1 className={styles.title}>{title}</h1>
                 <p className={styles.leading}>By <em>{author.username}</em>, {moment(created_at).fromNow()}</p>
             </div>
             <PostContent
-                loading={loading.content}
+                loadContent={loading.content}
                 visible={visible}
                 content={content || 'Loading...'}
+                isSelf={isSelf}
+                isSuper={isSuper}
             />
             <CommentsList {...commentsListProps}/>
         </div>
@@ -68,7 +94,8 @@ function mapStateToProps(state, ownProps) {
             content: state.loading.effects['posts/fetchPostContent'],
             comments: state.loading.effects['posts/fetchPostComments'],
             post: state.loading.effects['posts/displayPost'],
-            patchComment: state.loading.effects['posts/patchComment']
+            patchComment: state.loading.effects['posts/patchComment'],
+            setVisible: state.loading.effects['posts/setPostVisibility']
         },
         account: state.app.account
     };

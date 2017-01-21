@@ -6,18 +6,28 @@ import styles from './PostContent.css'
 function PostContent({
     content,
     visible,
-    loading
+    loadContent,
+    isSelf,
+    isSuper
 }) {
     return (
-        <Spin spinning={!!loading}>
+        <Spin spinning={!!loadContent}>
             <div className={styles.content}>
                 {
                     visible
                         ? <div dangerouslySetInnerHTML={{__html: marked(content)}}/>
-                        : <Alert
-                            message="this post was hidden by the super admin.."
-                            type="warning"
-                            showIcon/>
+                        : <div>
+                            <Alert
+                                message="This Post was hidden by the Super Admin.. Only the Author and Super Admin can see it."
+                                type="warning"
+                                showIcon
+                            />
+                            {
+                                isSelf || isSuper
+                                    ? <div dangerouslySetInnerHTML={{__html: marked(content)}}/>
+                                    : null
+                            }
+                        </div>
                 }
             </div>
         </Spin>
@@ -26,7 +36,9 @@ function PostContent({
 
 PostContent.propTypes = {
     visible: PropTypes.bool.isRequired,
-    content: PropTypes.string.isRequired
+    content: PropTypes.string.isRequired,
+    isSelf: PropTypes.bool.isRequired,
+    isSuper: PropTypes.bool.isRequired
 };
 
 export default PostContent;

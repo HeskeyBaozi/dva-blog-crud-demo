@@ -26,18 +26,33 @@ function CommentsList({
                 comment_id,
             } = record;
 
+            const isSelf = currentAccount.user_id === author.user_id;
+            const isSuper = currentAccount.ability === 'super';
+
             return (
                 <div>
                     <div className={styles.content}>
-                        {visible ? content :
-                            <Alert type="warning" message="This Comment was hidden by the Super Admin..." showIcon/>
+                        {
+                            visible
+                                ? content
+                                : <div>
+                                    <Alert type="warning"
+                                           message={"This Comment was hidden by the Super Admin..." +
+                                           " Only the Author and Super Admin can see it."
+                                           } showIcon/>
+                                    {
+                                        isSelf || isSuper
+                                            ? content
+                                            : null
+                                    }
+                                </div>
                         }
                     </div>
                     <p className={styles.meta}>
                         by <em>{author.username}</em>, {moment(created_at).fromNow()}
                     </p>
                     <CommentPanel
-                        isSelf={currentAccount.user_id === author.user_id}
+                        isSelf={isSelf}
                         isSuper={currentAccount.ability === 'super'}
                         visible={visible}
                         commit={({editorContent, onComplete}) => dispatch({

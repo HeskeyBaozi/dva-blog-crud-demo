@@ -87,15 +87,10 @@ export default {
                     payload: {postInfo: data}
                 });
                 onComplete();
-                if (data.visible) {
-                    yield [
-                        put({type: 'fetchPostContent'}),
-                        put({type: 'fetchPostComments'})
-                    ];
-                } else {
-                    yield put({type: 'fetchPostComments'});
-                }
-
+                yield [
+                    put({type: 'fetchPostContent'}),
+                    put({type: 'fetchPostComments'})
+                ];
             }
         },
         fetchPostContent: function*({payload}, {call, put, select}) {
@@ -152,11 +147,15 @@ export default {
                 yield put(routerRedux.push(`/posts/${post_id}`));
             }
         },
-        setPostVisibility: function*({payload}, {call, put}) {
+        setPostVisibility: function*({payload}, {call, put, select}) {
             const {visible, post_id} = payload;
             const {data:updatedPost} = yield call(setVisibilityOfPost, {visible, post_id});
             if (updatedPost) {
                 yield put({type: 'savePostVisibility', payload: {updatedPost}});
+                const currentPostId = yield select(state => state.posts.current.post.post_id);
+                if (currentPostId === post_id) {
+                    yield put({type: 'saveCurrentPostVisibility', payload: {updatedPost}});
+                }
                 message.success('set post visibility successfully :)');
             }
         },
@@ -370,6 +369,20 @@ export default {
                 postsList: state.postsList.map(post => {
                     return post_id === post.post_id ? updatedPost : post;
                 })
+            };
+        },
+        saveCurrentPostVisibility: function (state, {payload}) {
+            const {updatedPost} = payload;
+            const {visible} = updatedPost;
+            return {
+                ...state,
+                current: {
+                    ...state.current,
+                    post: {
+                        ...state.current.post,
+                        visible
+                    }
+                }
             };
         },
         saveCommentVisibility: function (state, {payload}) {
