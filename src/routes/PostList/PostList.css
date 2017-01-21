@@ -20,6 +20,10 @@
     float: right;
 }
 
+.title {
+    padding: 16px 8px 0 8px;
+}
+
 .icon {
     margin-right: 8px;
 }

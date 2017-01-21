@@ -65,8 +65,8 @@ export default {
     },
     effects: {
         fetchPostsList: function *({payload}, {call, put}) {
-            const {pageInfo} = payload;
-            const {data:list} = yield call(fetchPosts, {pageInfo});
+            const {pageInfo, keyword} = payload;
+            const {data:list} = yield call(fetchPosts, {pageInfo, keyword});
 
             if (list) {
                 yield put({

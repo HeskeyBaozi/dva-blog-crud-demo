@@ -2,7 +2,7 @@ import React, {PropTypes} from 'react';
 import {connect} from 'dva';
 import {Link} from 'dva/router';
 import styles from './PostList.css';
-import {Table, Card, Button, Tag, Icon, Tooltip, Spin} from 'antd';
+import {Table, Card, Button, Tag, Icon, Tooltip, Spin, Input} from 'antd';
 import PostPanel from '../../components/PostPanel/PostPanel';
 import moment from 'moment';
 
@@ -119,18 +119,29 @@ function PostList({
         rowKey: 'post_id',
         pagination,
         loading,
-        title: () => <div>
-            <Link to="/editor?type=creator">
-                <Button type="primary" size="large" icon="addfile" className={styles.addPost}>Add Post</Button>
-            </Link>
-            <h1><Icon type="file-text" className={styles.icon}/>Posts</h1>
-        </div>
+        title: () => <Input.Search placeholder="Search Post By Title."
+                                   onSearch={keyword => dispatch({
+                                       type: 'posts/fetchPostsList',
+                                       payload: {
+                                           pageInfo: {limit: paging.per_page, page: paging.page},
+                                           keyword
+                                       }
+                                   })}/>
     };
 
     return (
-        <Table {...tableProps}>
-            <Column {...columnProps}/>
-        </Table>
+        <div>
+            <div className={styles.title}>
+                <Link to="/editor?type=creator">
+                    <Button type="primary" size="large" icon="addfile" className={styles.addPost}>Add Post</Button>
+                </Link>
+                <h1><Icon type="file-text" className={styles.icon}/>Posts</h1>
+            </div>
+            <Table {...tableProps}>
+                <Column {...columnProps}/>
+            </Table>
+        </div>
+
     );
 }
 

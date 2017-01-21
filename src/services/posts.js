@@ -4,9 +4,9 @@ import request from '../utils/request';
 import {stringify} from 'qs';
 import {storageTokenKey} from '../utils/constant';
 
-export function fetchPosts({pageInfo}) {
+export function fetchPosts({pageInfo, keyword}) {
     const token = window.localStorage.getItem(storageTokenKey);
-    return request(`/api/posts?${stringify(pageInfo)}`, {
+    return request(`/api/posts?${stringify({...pageInfo, keyword})}`, {
         method: 'get',
         headers: new Headers({
             "Authorization": `Bearer ${token}`
