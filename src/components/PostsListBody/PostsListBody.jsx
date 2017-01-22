@@ -3,6 +3,7 @@ import styles from './PostsListBody.css';
 import {Table} from 'antd';
 import SearchKeyword from '../../components/SearchKeyword/SearchKeyword';
 import PostItem from './PostItem/PostItem';
+import QueueAnimate from 'rc-queue-anim';
 
 
 const {Column} = Table;
@@ -11,7 +12,7 @@ function PostsListBody({
     postsList,
     pagination,
     onSearch,
-    loadPosts,
+    loading,
     currentAccountUserId,
     isSuper,
     onDelete,
@@ -22,7 +23,7 @@ function PostsListBody({
         <Table dataSource={postsList}
                showHeader={false}
                rowKey="post_id"
-               loading={loadPosts}
+               loading={loading}
                pagination={pagination}
                title={() => <SearchKeyword onSearch={onSearch}/>}
                onChange={onTableChange}
@@ -30,7 +31,7 @@ function PostsListBody({
             <Column title="posts" key="posts"
                     render={(text, record) => {
                         return <PostItem record={record}
-                                         isSelf={currentAccountUserId === record.user_id}
+                                         isSelf={currentAccountUserId === record.author.user_id}
                                          isSuper={isSuper}
                                          onDelete={onDelete}
                                          onChangeVisibility={onChangeVisibility}/>;

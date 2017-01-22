@@ -22,7 +22,7 @@ function RouterConfig({history, app}) {
             type: 'posts/displayPost',
             payload: {post_id: nextState.params.post_id},
             onComplete: callback
-        })
+        });
     }
 
     function requireTypeOrPostId(nextState, replace, callback) {
@@ -47,7 +47,9 @@ function RouterConfig({history, app}) {
             <Route path="/" breadcrumbName="Home" component={App} onEnter={requireAuth}>
                 <IndexRedirect to="posts"/>
                 <Route path="posts" breadcrumbName="Posts" component={PostsListPage}/>
-                <Route path="posts/:post_id" breadcrumbName="Post Detail" onEnter={requirePrepared}
+                <Route path="posts/:post_id"
+                       breadcrumbName="Post Detail"
+                       onEnter={requirePrepared}
                        component={PostPage}/>
                 <Route path="editor" breadcrumbName="Editor" component={PostEditor} onEnter={requireTypeOrPostId}/>
                 <Route path="user" breadcrumbName="User Detail" component={UserPage}/>

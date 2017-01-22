@@ -60,6 +60,18 @@ export default {
                         }
                     });
                 }
+
+                if (pathToRegExp('/user').exec(location.pathname)) {
+                    dispatch({
+                        type: 'fetchPostsListForUser',
+                        payload: {
+                            pageInfo: {
+                                limit: 5,
+                                page: 1
+                            }
+                        }
+                    });
+                }
             });
         }
     },
@@ -67,6 +79,18 @@ export default {
         fetchPostsList: function *({payload}, {call, put}) {
             const {pageInfo, keyword} = payload;
             const {data:list} = yield call(fetchPosts, {pageInfo, keyword});
+
+            if (list) {
+                yield put({
+                    type: 'savePostsList',
+                    payload: list
+                });
+            }
+        },
+        fetchPostsListForUser: function*({payload}, {call, put, select}) {
+            const user_id = yield select(state => state.app.account.user_id);
+            const {pageInfo, keyword} = payload;
+            const {data:list} = yield call(fetchPosts, {pageInfo, keyword, user_id});
 
             if (list) {
                 yield put({

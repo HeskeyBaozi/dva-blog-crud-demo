@@ -15,6 +15,7 @@
     "marked": "^0.3.6",
     "path-to-regexp": "^1.7.0",
     "qs": "^6.3.0",
+    "rc-queue-anim": "^0.13.0",
     "react": "^15.4.0",
     "react-dom": "^15.4.0"
   },

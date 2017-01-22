@@ -9,7 +9,8 @@ function PostsListPage({
     currentAccount,
     postsList,
     paging,
-    dispatch
+    dispatch,
+    loadingPostsList
 }) {
     return (
         <div>
@@ -28,6 +29,7 @@ function PostsListPage({
                 currentAccountUserId={currentAccount.user_id}
                 isSuper={currentAccount.ability === 'super'}
                 postsList={postsList}
+                loading={loadingPostsList}
                 pagination={{
                     total: paging.total,
                     pageSize: paging.per_page,
@@ -83,11 +85,7 @@ PostsListPage.propTypes = {
         ability: PropTypes.oneOf(['super', 'normal'])
     }).isRequired,
     postsList: PropTypes.arrayOf(PropTypes.object).isRequired,
-    paging: PropTypes.shape({
-        per_page: PropTypes.number.isRequired,
-        page: PropTypes.number.isRequired,
-        total: PropTypes.number.isRequired
-    }).isRequired,
+    paging: PropTypes.object.isRequired,
     dispatch: PropTypes.func.isRequired
 };
 
@@ -96,7 +94,8 @@ function mapStateToProps(state, ownProps) {
     return {
         currentAccount: state.app.account,
         postsList: state.posts.postsList,
-        paging: state.posts.paging
+        paging: state.posts.paging,
+        loadingPostsList: state.loading.effects['posts/fetchPostsList']
     };
 }
 
