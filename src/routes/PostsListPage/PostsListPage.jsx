@@ -15,67 +15,79 @@ function PostsListPage({
         <div>
             <div className={styles.title}>
                 <Link to="/editor?type=creator">
-                    <Button type="primary" size="large" icon="addfile" className={styles.addPost}>Add Post</Button>
+                    <Button type="primary"
+                            size="large"
+                            icon="addfile"
+                            className={styles.addPost}>
+                        Add Post
+                    </Button>
                 </Link>
                 <h1><Icon type="file-text" className={styles.icon}/>Posts</h1>
             </div>
-            <PostsListBody currentAccountUserId={currentAccount.user_id}
-                           isSuper={currentAccount.ability === 'super'}
-                           postsList={postsList}
-                           pagination={{
-                               total: paging.total,
-                               pageSize: paging.per_page,
-                               showSizeChanger: true,
-                               pageSizeOptions: ['5', '10'],
-                               showQuickJumper: true
-                           }}
-                           onDelete={({toDeletePostId}) => {
-                               dispatch({
-                                   type: 'posts/deletePost',
-                                   payload: {
-                                       post_id: toDeletePostId,
-                                       paging: {limit: paging.per_page, page: paging.page}
-                                   }
-                               });
-                           }}
-                           onChangeVisibility={(checked, {toSetVisiblePostId, toSetVisibleValue}) => {
-                               dispatch({
-                                   type: 'posts/setPostVisibility',
-                                   payload: {
-                                       visible: toSetVisibleValue,
-                                       post_id: toSetVisiblePostId
-                                   }
-                               });
-                           }}
-                           onSearch={keyword => {
-                               dispatch({
-                                   type: 'posts/fetchPostsList',
-                                   payload: {
-                                       pageInfo: {limit: paging.per_page, page: paging.page},
-                                       keyword
-                                   }
-                               });
-                           }}
-                           onTableChange={nextPaginationState => {
-                               dispatch({
-                                   type: 'posts/fetchPostsList',
-                                   payload: {
-                                       pageInfo: {
-                                           limit: nextPaginationState.pageSize,
-                                           page: nextPaginationState.current
-                                       }
-                                   }
-                               });
-                           }}
-            />
+            <PostsListBody
+                currentAccountUserId={currentAccount.user_id}
+                isSuper={currentAccount.ability === 'super'}
+                postsList={postsList}
+                pagination={{
+                    total: paging.total,
+                    pageSize: paging.per_page,
+                    showSizeChanger: true,
+                    pageSizeOptions: ['5', '10'],
+                    showQuickJumper: true
+                }}
+                onDelete={({toDeletePostId}) => {
+                    dispatch({
+                        type: 'posts/deletePost',
+                        payload: {
+                            post_id: toDeletePostId,
+                            paging: {limit: paging.per_page, page: paging.page}
+                        }
+                    });
+                }}
+                onChangeVisibility={(checked, {toSetVisiblePostId, toSetVisibleValue}) => {
+                    dispatch({
+                        type: 'posts/setPostVisibility',
+                        payload: {
+                            visible: toSetVisibleValue,
+                            post_id: toSetVisiblePostId
+                        }
+                    });
+                }}
+                onSearch={keyword => {
+                    dispatch({
+                        type: 'posts/fetchPostsList',
+                        payload: {
+                            pageInfo: {limit: paging.per_page, page: paging.page},
+                            keyword
+                        }
+                    });
+                }}
+                onTableChange={nextPaginationState => {
+                    dispatch({
+                        type: 'posts/fetchPostsList',
+                        payload: {
+                            pageInfo: {
+                                limit: nextPaginationState.pageSize,
+                                page: nextPaginationState.current
+                            }
+                        }
+                    });
+                }}/>
         </div>
     );
 }
 
 PostsListPage.propTypes = {
-    currentAccount: PropTypes.object.isRequired,
-    postsList: PropTypes.array.isRequired,
-    paging: PropTypes.object.isRequired,
+    currentAccount: PropTypes.shape({
+        user_id: PropTypes.string.isRequired,
+        ability: PropTypes.oneOf(['super', 'normal'])
+    }).isRequired,
+    postsList: PropTypes.arrayOf(PropTypes.object).isRequired,
+    paging: PropTypes.shape({
+        per_page: PropTypes.number.isRequired,
+        page: PropTypes.number.isRequired,
+        total: PropTypes.number.isRequired
+    }).isRequired,
     dispatch: PropTypes.func.isRequired
 };
 
