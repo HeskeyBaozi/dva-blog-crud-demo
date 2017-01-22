@@ -128,6 +128,8 @@ function PostList({
         />
     };
 
+    console.log(paging);
+
     return (
         <div>
             <div className={styles.title}>

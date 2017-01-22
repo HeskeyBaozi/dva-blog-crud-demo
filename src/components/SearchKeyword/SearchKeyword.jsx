@@ -1,5 +1,6 @@
 import React, {PropTypes} from 'react';
 import {Input} from 'antd';
+import debounce from 'lodash.debounce';
 
 
 class SearchKeyword extends React.Component {
@@ -18,8 +19,14 @@ class SearchKeyword extends React.Component {
     };
 
     handleChange = e => {
+
         this.setState({value: e.target.value});
+        console.log(e.target.value);
+        if (this.state.value)
+            this.debouncedSearch(e.target.value);
     };
+
+    debouncedSearch = debounce(this.props.onSearch, 200);
 
     render() {
         return <Input.Search
