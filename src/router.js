@@ -3,9 +3,10 @@ import {Router, Route, IndexRoute, IndexRedirect} from 'dva/router';
 import App from './routes/app';
 import Login from './routes/Login/Login';
 import Register from './routes/Register/Register';
-import PostList from './routes/PostList/PostList';
+import PostsListPage from './routes/PostsListPage/PostsListPage';
 import PostPage from "./routes/PostPage/PostPage";
 import PostEditor from './routes/PostEditor/PostEditor';
+import UserPage from './routes/UserPage/UserPage';
 
 function RouterConfig({history, app}) {
     function requireAuth(nextState, replace, callback) {
@@ -45,10 +46,11 @@ function RouterConfig({history, app}) {
             <Route path="/register" component={Register}/>
             <Route path="/" breadcrumbName="Home" component={App} onEnter={requireAuth}>
                 <IndexRedirect to="posts"/>
-                <Route path="posts" breadcrumbName="Posts" component={PostList}/>
+                <Route path="posts" breadcrumbName="Posts" component={PostsListPage}/>
                 <Route path="posts/:post_id" breadcrumbName="Post Detail" onEnter={requirePrepared}
                        component={PostPage}/>
                 <Route path="editor" breadcrumbName="Editor" component={PostEditor} onEnter={requireTypeOrPostId}/>
+                <Route path="user" breadcrumbName="User Detail" component={UserPage}/>
             </Route>
             <Route path="*" breadcrumbName="Not Found" component={props => <h1>Oops! Not Found</h1>}/>
         </Router>

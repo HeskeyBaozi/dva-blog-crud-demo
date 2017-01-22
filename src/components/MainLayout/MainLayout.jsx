@@ -13,22 +13,6 @@ const MainLayout = ({
     children,
     handleClickLogOut
 }) => {
-
-    const menuProps = {
-        mode: 'horizontal',
-        defaultSelectedKeys: ['1'],
-        className: styles.menu
-    };
-
-    const breadcrumbProps = {
-        routes,
-        params
-    };
-
-    const userInfoProps = {
-        account,
-        handleClickLogOut
-    };
     return (
         <Layout className={styles.layoutContainer}>
             <Header className={styles.header}>
@@ -36,21 +20,25 @@ const MainLayout = ({
                     <div className={styles.logo}>
                         <img src={LogoImg} alt="my blog!"/>
                     </div>
-                    <UserInfo {...userInfoProps}/>
-                    <Menu {...menuProps} >
+                    <UserInfo account={account} handleClickLogOut={handleClickLogOut}/>
+                    <Menu mode="horizontal" defaultSelectedKeys={['1']} className={styles.menu}>
                         <Menu.Item key="1">
                             <Link to="/posts">
                                 <Icon type="file-text" className={styles.icon}/>Posts
                             </Link>
                         </Menu.Item>
-                        <Menu.Item key="2">User</Menu.Item>
+                        <Menu.Item key="2">
+                            <Link to="/user">
+                                <Icon type="user" className={styles.icon}/>User
+                            </Link>
+                        </Menu.Item>
                     </Menu>
                 </div>
             </Header>
             <Content className={styles.content}>
                 <div className={styles.mainContainer}>
                     <div className={styles.mainContent}>
-                        <Breadcrumb {...breadcrumbProps} className={styles.breadcrumb}/>
+                        <Breadcrumb routes={routes} params={params} className={styles.breadcrumb}/>
                         {children}
                     </div>
                 </div>
@@ -58,7 +46,7 @@ const MainLayout = ({
             <Footer className={styles.footer}>
                 Heskey Baozi, 15331097
             </Footer>
-            <BackTop className={styles.backTop} />
+            <BackTop className={styles.backTop}/>
         </Layout>
     )
 };

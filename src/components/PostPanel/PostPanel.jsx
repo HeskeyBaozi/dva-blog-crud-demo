@@ -12,13 +12,22 @@ function PostPanel({
     onChangeVisibility,
     visible
 }) {
+
+    function handleConfirm() {
+        onDelete({toDeletePostId: editPostId});
+    }
+
+    function handleChange(checked) {
+        onChangeVisibility(checked, {toSetVisiblePostId: editPostId, toSetVisibleValue: !visible});
+    }
+
     return (<div className={styles.panel}>
         {
             isSuper
                 ? <Switch checked={visible}
                           checkedChildren="visible"
                           unCheckedChildren="unvisible"
-                          onChange={onChangeVisibility}
+                          onChange={handleChange}
                           className={styles.switch}/>
                 : null
         }
@@ -34,7 +43,7 @@ function PostPanel({
                         title="Are you sure to delete this Post?"
                         onText="Yes, sure"
                         cancelText="Cancel"
-                        onConfirm={onDelete}
+                        onConfirm={handleConfirm}
                     >
                         <Button size="small" type="ghost" icon="delete">
                             Delete
