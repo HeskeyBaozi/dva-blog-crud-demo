@@ -1,5 +1,5 @@
 import React, {PropTypes} from 'react';
-import {Layout, Menu, Breadcrumb, Icon, BackTop} from 'antd';
+import {Layout, Menu, Breadcrumb, Icon, BackTop, Affix} from 'antd';
 import {Link} from 'dva/router';
 import LogoImg from '../../assets/dog_48px_1182381_easyicon.net.png';
 import styles from './MainLayout.less';
@@ -15,26 +15,28 @@ const MainLayout = ({
 }) => {
     return (
         <Layout className={styles.layoutContainer}>
-            <Header className={styles.header}>
-                <div className={styles.mainContainer}>
-                    <div className={styles.logo}>
-                        <img src={LogoImg} alt="my blog!"/>
+            <Affix offsetTop={0}>
+                <Header className={styles.header}>
+                    <div className={styles.mainContainer}>
+                        <div className={styles.logo}>
+                            <img src={LogoImg} alt="my blog!"/>
+                        </div>
+                        <UserInfo account={account} handleClickLogOut={handleClickLogOut}/>
+                        <Menu mode="horizontal" defaultSelectedKeys={['1']} className={styles.menu}>
+                            <Menu.Item key="1">
+                                <Link to="/posts">
+                                    <Icon type="file-text" className={styles.icon}/>Posts
+                                </Link>
+                            </Menu.Item>
+                            <Menu.Item key="2">
+                                <Link to={`/user/${account.user_id}`}>
+                                    <Icon type="user" className={styles.icon}/>User
+                                </Link>
+                            </Menu.Item>
+                        </Menu>
                     </div>
-                    <UserInfo account={account} handleClickLogOut={handleClickLogOut}/>
-                    <Menu mode="horizontal" defaultSelectedKeys={['1']} className={styles.menu}>
-                        <Menu.Item key="1">
-                            <Link to="/posts">
-                                <Icon type="file-text" className={styles.icon}/>Posts
-                            </Link>
-                        </Menu.Item>
-                        <Menu.Item key="2">
-                            <Link to={`/user/${account.user_id}`}>
-                                <Icon type="user" className={styles.icon}/>User
-                            </Link>
-                        </Menu.Item>
-                    </Menu>
-                </div>
-            </Header>
+                </Header>
+            </Affix>
             <Content className={styles.content}>
                 <div className={styles.mainContainer}>
                     <div className={styles.mainContent}>
