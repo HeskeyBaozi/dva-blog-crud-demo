@@ -25,7 +25,7 @@ function PostEditor({
             if (!error) {
                 if (isCreator) {
                     dispatch({
-                        type: 'posts/createNewPost',
+                        type: 'editor/createPost',
                         payload: {
                             title: postTitle,
                             content: postContent
@@ -33,7 +33,7 @@ function PostEditor({
                     });
                 } else {
                     dispatch({
-                        type: 'posts/patchPost',
+                        type: 'editor/patchPost',
                         payload: {
                             title: postTitle,
                             content: postContent,

@@ -1,7 +1,11 @@
 import {
     fetchContent,
     fetchPostInfo,
+    createPost,
+    patchPost
 } from '../services/posts';
+import {message} from 'antd';
+import {routerRedux} from 'dva/router';
 
 export default {
     namespace: 'editor',
@@ -43,6 +47,24 @@ export default {
         initializeCreator: function *({onComplete}, {put}) {
             yield put({type: 'saveCreatorInitialValue'});
             onComplete();
+        },
+        createPost: function*({payload}, {call, put}) {
+            const {title, content} = payload;
+            const {data} = yield call(createPost, {title, content});
+
+            if (data) {
+                const {post_id} = data;
+                message.success('create post successfully :)');
+                yield put(routerRedux.push(`/posts/${post_id}`));
+            }
+        },
+        patchPost: function *({payload}, {call, put}) {
+            const {title, content, post_id} = payload;
+            const {data} = yield call(patchPost, {title, content, post_id});
+            if (data) {
+                message.success('patch post successfully :)');
+                yield put(routerRedux.push(`/posts/${post_id}`));
+            }
         }
     },
     reducers: {
@@ -52,7 +74,8 @@ export default {
                 ...state,
                 post: {
                     ...state.post,
-                    ...post
+                    ...post,
+                    content: ''
                 },
                 isCreator: false
             };

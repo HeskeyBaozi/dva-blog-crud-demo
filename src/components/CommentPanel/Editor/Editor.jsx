@@ -16,7 +16,7 @@ class Editor extends React.Component {
             if (!error) {
                 this.props.commit({
                     editorContent,
-                    onComplete: () => this.handleClose()
+                    closeEditor: () => this.handleClose()
                 });
             }
         });

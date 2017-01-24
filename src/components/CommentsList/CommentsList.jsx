@@ -7,34 +7,44 @@ import CommentPanel from '../CommentPanel/CommentPanel';
 const {Column} = Table;
 
 function CommentsList({
-    descendants,
-    loadingComments,
+    loading,
+    commentsList,
     loadingPatch,
-    currentAccount,
-    dispatch
+    onDelete,
+    onPatch,
+    onCreate,
+    onChangeCommentVisibility,
+    isSuper,
+    currentAccountUserId
 }) {
-
     const columnProps = {
         title: 'Comments',
         key: 'descendants',
         render: (text, record) => {
-            const {
-                content,
-                author,
-                created_at,
-                visible,
-                comment_id,
-            } = record;
+            const isSelf = currentAccountUserId === record.author.user_id;
 
-            const isSelf = currentAccount.user_id === author.user_id;
-            const isSuper = currentAccount.ability === 'super';
+            function handleDelete() {
+                onDelete({comment_id: record.comment_id});
+            }
+
+            function handlePatch({editorContent, closeEditor}) {
+                onPatch({
+                    editorContent,
+                    comment_id: record.comment_id,
+                    closeEditor
+                });
+            }
+
+            function handleChangeVisibility(checked) {
+                onChangeCommentVisibility({visible: !record.visible, comment_id: record.comment_id});
+            }
 
             return (
                 <div>
                     <div className={styles.content}>
                         {
-                            visible
-                                ? content
+                            record.visible
+                                ? record.content
                                 : <div>
                                     <Alert type="warning"
                                            message={"This Comment was hidden by the Super Admin..." +
@@ -42,36 +52,23 @@ function CommentsList({
                                            } showIcon/>
                                     {
                                         isSelf || isSuper
-                                            ? content
+                                            ? record.content
                                             : null
                                     }
                                 </div>
                         }
                     </div>
                     <p className={styles.meta}>
-                        by <em>{author.username}</em>, {moment(created_at).fromNow()}
+                        by <em>{record.author.username}</em>, {moment(record.created_at).fromNow()}
                     </p>
                     <CommentPanel
                         isSelf={isSelf}
-                        isSuper={currentAccount.ability === 'super'}
-                        visible={visible}
-                        commit={({editorContent, onComplete}) => dispatch({
-                            type: 'posts/patchComment',
-                            payload: {editorContent, comment_id},
-                            onComplete
-                        })}
-                        initialValue={content}
-                        onDelete={() => dispatch({
-                            type: 'posts/deleteComment',
-                            payload: {comment_id}
-                        })}
-                        onChangeVisibility={checked => dispatch({
-                            type: 'posts/setCommentVisibility',
-                            payload: {
-                                visible: !visible,
-                                comment_id
-                            }
-                        })}
+                        isSuper={isSuper}
+                        visible={record.visible}
+                        commit={handlePatch}
+                        initialValue={record.content}
+                        onDelete={handleDelete}
+                        onChangeVisibility={handleChangeVisibility}
                         patchLoading={loadingPatch}
                     />
                 </div>
@@ -82,32 +79,32 @@ function CommentsList({
     return (
         <div>
             <Table
-                loading={loadingComments}
+                loading={loading}
                 rowKey="comment_id"
                 size="small"
                 showHeader={false}
-                dataSource={descendants}
-                title={() => <h2><Icon type="message" className={styles.icon}/>{descendants.length} Comment(s)</h2>}
+                dataSource={commentsList}
+                title={() => <h2><Icon type="message" className={styles.icon}/>{commentsList.length} Comment(s)</h2>}
             >
                 <Column {...columnProps}/>
             </Table>
             <Publish
-                loading={loadingComments}
-                commit={({commentInput}) => {
-                    dispatch({
-                        type: 'posts/createNewComment',
-                        payload: {commentInput}
-                    });
-                }}
+                loading={loading}
+                commit={onCreate}
             />
         </div>
     );
 }
 
 CommentsList.propTypes = {
-    descendants: PropTypes.array.isRequired,
-    currentAccount: PropTypes.object.isRequired,
-    dispatch: PropTypes.func.isRequired
+    commentsList: PropTypes.array.isRequired,
+    onDelete: PropTypes.func.isRequired,
+    onPatch: PropTypes.func.isRequired,
+    onChangeCommentVisibility: PropTypes.func.isRequired,
+    onCreate: PropTypes.func.isRequired,
+    isSuper: PropTypes.bool.isRequired,
+    currentAccountUserId: PropTypes.string.isRequired
+
 };
 
 export default CommentsList;

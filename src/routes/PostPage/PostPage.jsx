@@ -17,28 +17,21 @@ function PostPage({
         descendants,
         post_id
     },
-    loading,
     dispatch,
-    account
+    currentAccount,
+    commentsById,
+    loading
 }) {
-    const commentsReady = descendants.length && descendants[0].comment_id;
-    const commentsListProps = {
-        loadingComments: loading.comments,
-        loadingPatch: loading.patchComment,
-        dispatch,
-        descendants: commentsReady ? descendants : [], // coming from state.posts.current.descendants...
-        currentAccount: account
-
-    };
-    const isSelf = author.user_id === account.user_id;
-    const isSuper = account.ability === 'super';
+    const isSelf = author.user_id === currentAccount.user_id;
+    const isSuper = currentAccount.ability === 'super';
     return (
         <div>
             <div className={styles.header}>
                 <div className={styles.editPost}>
                     {
                         isSuper
-                            ? <Spin spinning={!!loading.setVisible}>
+                            ?
+                            <Spin spinning={!!loading.setVisible}>
                                 <Switch checked={visible}
                                         checkedChildren="visible"
                                         unCheckedChildren="unvisible"
@@ -51,13 +44,14 @@ function PostPage({
                                         })}
                                         className={styles.switch}/>
                             </Spin>
+
                             : null
                     }
                     {
                         isSelf
                             ?
 
-                            <Link to={`/editor?post_id=${post_id}`}>
+                            <Link to={`/editor/${post_id}`}>
                                 <Button type="primary" icon="edit">
                                     Edit Post
                                 </Button>
@@ -69,35 +63,83 @@ function PostPage({
                 <p className={styles.leading}>By <em>{author.username}</em>, {moment(created_at).fromNow()}</p>
             </div>
             <PostContent
-                loadContent={loading.content}
+                loading={loading.content || loading.setVisible}
                 visible={visible}
-                content={content || 'Loading...'}
+                content={content}
                 isSelf={isSelf}
                 isSuper={isSuper}
             />
-            <CommentsList {...commentsListProps}/>
+            <CommentsList
+                loading={loading.comment}
+                commentsList={descendants.map(comment_id => commentsById[comment_id]).filter(comment => comment)}
+
+                onCreate={({commentInput}) => {
+                    dispatch({
+                        type: 'post_detail/createComment',
+                        payload: {commentInput}
+                    });
+                }}
+                onDelete={({comment_id}) => {
+                    dispatch({
+                        type: 'post_detail/deleteCommentById',
+                        payload: {comment_id}
+                    });
+                }}
+                onPatch={({editorContent, comment_id, closeEditor}) => {
+                    dispatch({
+                        type: 'post_detail/patchCommentById',
+                        payload: {
+                            updatedContent: editorContent,
+                            comment_id
+                        },
+                        onComplete: closeEditor
+                    })
+                }}
+                onChangeCommentVisibility={({visible, comment_id}) => {
+                    dispatch({
+                        type: 'post_detail/setCommentVisibilityById',
+                        payload: {
+                            comment_id,
+                            visible
+                        }
+                    });
+                }}
+                currentAccountUserId={currentAccount.user_id}
+                isSuper={isSuper}/>
         </div>
     );
 }
 
 PostPage.propTypes = {
     currentPost: PropTypes.object.isRequired,
+    commentsById: PropTypes.object.isRequired,
     dispatch: PropTypes.func.isRequired,
-    account: PropTypes.object.isRequired,
+    currentAccount: PropTypes.object.isRequired,
+    loading: PropTypes.object.isRequired
 };
 
 function mapStateToProps(state, ownProps) {
+    function useOrOperation(prefix) {
+        return effectsNameArray => effectsNameArray
+            .map(effectsName => state.loading.effects[`${prefix}/${effectsName}`])
+            .reduce((left, right) => left || right);
+    }
+
     return {
-        post_id: ownProps.params.post_id,
-        currentPost: state.posts.current.post,
+        currentPost: state.post_detail.currentPost,
+        commentsById: state.post_detail.commentsById,
+        currentAccount: state.app.account,
         loading: {
-            content: state.loading.effects['posts/fetchPostContent'],
-            comments: state.loading.effects['posts/fetchPostComments'],
-            post: state.loading.effects['posts/displayPost'],
-            patchComment: state.loading.effects['posts/patchComment'],
-            setVisible: state.loading.effects['posts/setPostVisibility']
-        },
-        account: state.app.account
+            comment: useOrOperation('post_detail')([
+                'fetchPostComments',
+                'createComment',
+                'deleteCommentById',
+                'patchCommentById',
+                'setCommentVisibilityById'
+            ]),
+            content: state.loading.effects['post_detail/fetchPostContent'],
+            postVisible: state.loading.effects['posts/setPostVisibility']
+        }
     };
 }
 

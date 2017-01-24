@@ -8,10 +8,11 @@ function PostContent({
     visible,
     loadContent,
     isSelf,
-    isSuper
+    isSuper,
+    loading
 }) {
     return (
-        <Spin spinning={!!loadContent}>
+        <Spin spinning={!!loading}>
             <div className={styles.content}>
                 {
                     visible

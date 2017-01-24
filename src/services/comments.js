@@ -43,7 +43,7 @@ export function setVisibilityOfComment({comment_id, visible}) {
     });
 }
 
-export function patchComment({comment_id, editorContent}) {
+export function patchComment({comment_id, updatedContent}) {
     const token = window.localStorage.getItem(storageTokenKey);
     return request(`/api/comments/${comment_id}`, {
         method: 'PATCH',
@@ -52,7 +52,7 @@ export function patchComment({comment_id, editorContent}) {
             "Content-Type": "application/json; charset=utf-8"
         }),
         body: JSON.stringify({
-            content: editorContent
+            content: updatedContent
         })
     });
 }

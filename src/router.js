@@ -17,9 +17,9 @@ function RouterConfig({history, app}) {
         });
     }
 
-    function requirePrepared(nextState, replace, callback) {
+    function requirePostPrepared(nextState, replace, callback) {
         app._store.dispatch({
-            type: 'posts/displayPost',
+            type: 'post_detail/initializePostDetail',
             payload: {post_id: nextState.params.post_id},
             onComplete: callback
         });
@@ -50,9 +50,7 @@ function RouterConfig({history, app}) {
             <Route path="/" breadcrumbName="Home" component={App} onEnter={requireAuth}>
                 <IndexRedirect to="posts"/>
                 <Route path="posts" breadcrumbName="Posts" component={PostsListPage}/>
-                <Route path="posts/:post_id"
-                       breadcrumbName="Post Detail"
-                       onEnter={requirePrepared}
+                <Route path="posts/:post_id" breadcrumbName="Post Detail" onEnter={requirePostPrepared}
                        component={PostPage}/>
                 <Route path="editor" breadcrumbName="Editor - Create Post" component={PostEditor}
                        onEnter={requireEditorPrepared}/>
