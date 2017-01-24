@@ -2,7 +2,7 @@ import dva from 'dva';
 import {message} from 'antd';
 import createLoading from 'dva-loading';
 import './index.html';
-import './index.less';
+import './index.css';
 
 // 1. Initialize
 const app = dva({
@@ -22,6 +22,7 @@ app.use(createLoading({effects: true}));
 // 3. Model
 
 app.model(require("./models/app"));
+app.model(require("./models/editor"));
 app.model(require('./models/posts'));
 // 4. Router
 

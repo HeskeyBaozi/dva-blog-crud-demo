@@ -34,7 +34,7 @@ function PostPanel({
         {
             isSelf
                 ? <div>
-                    <Link to={`/editor?post_id=${editPostId}`}>
+                    <Link to={`/editor/${editPostId}`}>
                         <Button size="small" type="ghost" icon="edit">
                             Edit
                         </Button>

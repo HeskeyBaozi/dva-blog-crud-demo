@@ -15,7 +15,7 @@ function PostEditor({
     post,
     dispatch,
     isCreator,
-    loading,
+    loadingSubmit,
     loadingEditorContent
 }) {
 
@@ -99,7 +99,7 @@ function PostEditor({
                             <Button icon={isCreator ? 'plus-square-o' : 'edit'}
                                     htmlType="submit"
                                     type="primary"
-                                    loading={loading}
+                                    loading={loadingSubmit}
                             >{isCreator ? 'Create' : 'Edit'}</Button>
                         </Button.Group>
                     </Form.Item>
@@ -117,10 +117,10 @@ PostEditor.propTypes = {
 
 function mapStateToProps(state, ownProps) {
     return {
-        isCreator: ownProps.location.query.type === 'creator',
-        post: state.posts.editor.post,
-        loading: state.loading.effects['posts/createNewPost'],
-        loadingEditorContent: state.loading.effects['posts/loadEditorContent']
+        isCreator: state.editor.isCreator,
+        post: state.editor.post,
+        loadingSubmit: state.loading.effects['posts/createNewPost'] || state.loading.effects['posts/patchPost'],
+        loadingEditorContent: state.loading.effects['editor/initializeEditorContent']
     };
 }
 

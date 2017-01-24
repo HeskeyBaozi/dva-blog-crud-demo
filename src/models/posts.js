@@ -140,29 +140,6 @@ export default {
                 });
             }
         },
-        loadEditorInfo: function *({payload, onComplete}, {call, put}) {
-            const {post_id} = payload;
-            const {data} = yield call(fetchPostInfo, {post_id});
-            if (data) {
-                yield put({
-                    type: 'saveEditorInitialValue',
-                    payload: {post: data}
-                });
-                onComplete();
-                yield put({type: 'loadEditorContent'});
-            }
-        },
-        loadEditorContent: function*({payload}, {call, put, select}) {
-            const post_id = yield select(state => state.posts.editor.post.post_id);
-            const {data} = yield call(fetchContent, {post_id});
-            if (data) {
-                const {content} = data;
-                yield put({
-                    type: 'saveEditorContent',
-                    payload: {content}
-                });
-            }
-        },
         patchPost: function *({payload}, {call, put}) {
             const {title, content, post_id} = payload;
             const {data:updatedPost} = yield call(patchPost, {title, content, post_id});
@@ -357,32 +334,6 @@ export default {
             return {
                 ...state,
                 postsList: list
-            };
-        },
-        saveEditorInitialValue: function (state, {payload}) {
-            const {post} = payload;
-            return {
-                ...state,
-                editor: {
-                    ...state.editor,
-                    post: {
-                        ...state.editor.post,
-                        ...post
-                    }
-                }
-            };
-        },
-        saveEditorContent: function (state, {payload}) {
-            const {content} = payload;
-            return {
-                ...state,
-                editor: {
-                    ...state.editor,
-                    post: {
-                        ...state.editor.post,
-                        content
-                    }
-                }
             };
         },
         savePostVisibility: function (state, {payload}) {
