@@ -10,6 +10,7 @@ function UserPage({
     currentAccount,
     account,
     postsList,
+    postsById,
     paging,
     dispatch,
     loadingUserPostList,
@@ -44,8 +45,8 @@ function UserPage({
                                       tab={<span><Icon type="file-text"/>{isSelf ? 'My ' : 'His or Her '}Posts</span>}>
                             <PostsListBody
                                 currentAccountUserId={currentAccount.user_id}
-                                isSuper={account.ability === 'super'}
-                                postsList={postsList}
+                                isSuper={isSuper}
+                                postsList={postsList.map(post_id => postsById[post_id]).filter(post => post)}
                                 loading={loadingUserPostList}
                                 pagination={{
                                     total: paging.total,
@@ -106,7 +107,8 @@ UserPage.propTypes = {
         ability: PropTypes.oneOf(['super', 'normal'])
     }).isRequired,
     currentAccount: PropTypes.object.isRequired,
-    postsList: PropTypes.arrayOf(PropTypes.object).isRequired,
+    postsList: PropTypes.arrayOf(PropTypes.string).isRequired,
+    postsById: PropTypes.object.isRequired,
     paging: PropTypes.object.isRequired,
     dispatch: PropTypes.func.isRequired
 };
@@ -116,6 +118,7 @@ function mapStateToProps(state, ownProps) {
         account: state.profile.account,
         currentAccount: state.app.account,
         postsList: state.profile.posts.list,
+        postsById: state.profile.posts.byId,
         paging: state.profile.posts.paging,
         loadingUserPostList: state.loading.effects['profile/fetchPostsList'],
         loadingUserInfo: state.loading.effects['profile/fetchUserInfo']

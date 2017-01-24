@@ -61,7 +61,6 @@ export default {
         logout: function *({payload}, {put}) {
             yield put({type: 'authFail'});
             window.localStorage.removeItem(storageTokenKey);
-            message.success('Log out successfully :)');
             yield put(routerRedux.push('/login'));
         },
         queryUser: function *({payload}, {put, call}) {

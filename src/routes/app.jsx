@@ -1,6 +1,7 @@
 import React, {PropTypes} from 'react';
 import {connect} from 'dva';
 import MainLayout from '../components/MainLayout/MainLayout';
+import {message} from 'antd';
 
 const App = ({
     children,
@@ -16,6 +17,7 @@ const App = ({
         account,
         handleClickLogOut: function (e) {
             e.preventDefault();
+            message.success('Log out successfully :)');
             dispatch({type: 'app/logout'});
         }
     };

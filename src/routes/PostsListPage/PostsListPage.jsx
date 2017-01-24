@@ -8,6 +8,7 @@ import PostsListBody from '../../components/PostsListBody/PostsListBody';
 function PostsListPage({
     currentAccount,
     postsList,
+    postsById,
     paging,
     dispatch,
     loadingPostsList
@@ -28,7 +29,7 @@ function PostsListPage({
             <PostsListBody
                 currentAccountUserId={currentAccount.user_id}
                 isSuper={currentAccount.ability === 'super'}
-                postsList={postsList}
+                postsList={postsList.map(post_id => postsById[post_id]).filter(post => post)}
                 loading={loadingPostsList}
                 pagination={{
                     total: paging.total,
@@ -84,7 +85,8 @@ PostsListPage.propTypes = {
         user_id: PropTypes.string.isRequired,
         ability: PropTypes.oneOf(['super', 'normal'])
     }).isRequired,
-    postsList: PropTypes.arrayOf(PropTypes.object).isRequired,
+    postsById: PropTypes.object.isRequired,
+    postsList: PropTypes.arrayOf(PropTypes.string).isRequired,
     paging: PropTypes.object.isRequired,
     dispatch: PropTypes.func.isRequired
 };
@@ -94,6 +96,7 @@ function mapStateToProps(state, ownProps) {
     return {
         currentAccount: state.app.account,
         postsList: state.posts.postsList,
+        postsById: state.posts.postsById,
         paging: state.posts.paging,
         loadingPostsList: state.loading.effects['posts/fetchPostsList']
     };

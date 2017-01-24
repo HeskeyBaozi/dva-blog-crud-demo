@@ -9,6 +9,9 @@ import {
 } from '../services/user';
 
 import {message} from 'antd';
+import {normalize, schema} from 'normalizr';
+
+const post = new schema.Entity('posts', {}, {idAttribute: 'post_id'});
 
 export default {
     namespace: 'profile',
@@ -21,7 +24,8 @@ export default {
         },
         posts: {
             list: [],
-            paging: {}
+            paging: {},
+            byId: {}
         }
     },
     effects: {
@@ -88,12 +92,14 @@ export default {
         },
         savePostsList: function (state, {payload}) {
             const {paging, data} = payload;
+            const normalized = normalize(data, [post]);
             return {
                 ...state,
                 posts: {
                     ...state.posts,
                     paging,
-                    list: data
+                    list: normalized.result,
+                    byId: normalized.entities.posts
                 }
             };
         },
@@ -114,9 +120,10 @@ export default {
                 ...state,
                 posts: {
                     ...state.posts,
-                    list: state.posts.list.map(post => {
-                        return post_id === post.post_id ? updatedPost : post;
-                    })
+                    byId: {
+                        ...state.posts.byId,
+                        [post_id]: updatedPost
+                    }
                 }
             };
         }

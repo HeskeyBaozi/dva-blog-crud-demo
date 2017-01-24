@@ -1,7 +1,7 @@
 import React, {PropTypes} from 'react';
 import {Alert, Spin} from 'antd';
 import marked from 'marked';
-import styles from './PostContent.css'
+import styles from './PostContent.less'
 
 function PostContent({
     content,

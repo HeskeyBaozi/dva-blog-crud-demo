@@ -1,6 +1,8 @@
 import pathToRegExp from 'path-to-regexp';
-import {normalize, schema, denormalize} from 'normalizr';
+import {normalize, schema} from 'normalizr';
 import {message} from 'antd';
+
+const post = new schema.Entity('posts', {}, {idAttribute: 'post_id'});
 
 import {
     fetchPosts,
@@ -12,7 +14,8 @@ export default {
     namespace: 'posts',
     state: {
         postsList: [],
-        paging: {}
+        paging: {},
+        postsById: {}
     },
     subscriptions: {
         setup: function ({history, dispatch}) {
@@ -65,18 +68,12 @@ export default {
     reducers: {
         savePostsList: function (state, {payload}) {
             const {paging, data:list} = payload;
+            const normalized = normalize(list, [post]);
             return {
                 ...state,
                 paging,
-                postsList: list
-            };
-        },
-        deletePostSuccess: function (state, {payload}) {
-            const {post_id} = payload;
-            const list = state.postsList.filter(post => post.post_id !== post_id);
-            return {
-                ...state,
-                postsList: list
+                postsList: normalized.result,
+                postsById: normalized.entities.posts
             };
         },
         savePostVisibility: function (state, {payload}) {
@@ -84,9 +81,10 @@ export default {
             const {post_id} = updatedPost;
             return {
                 ...state,
-                postsList: state.postsList.map(post => {
-                    return post_id === post.post_id ? updatedPost : post;
-                })
+                postsById: {
+                    ...state.postsById,
+                    [post_id]: updatedPost
+                }
             };
         }
     }
