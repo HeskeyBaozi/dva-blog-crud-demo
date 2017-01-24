@@ -25,3 +25,7 @@
 .switch {
     margin-right: 8px;
 }
+
+.toUser {
+    text-decoration: underline;
+}

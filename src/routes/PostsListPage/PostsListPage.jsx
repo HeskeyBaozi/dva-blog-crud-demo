@@ -15,7 +15,7 @@ function PostsListPage({
     return (
         <div>
             <div className={styles.title}>
-                <Link to="/editor?type=creator">
+                <Link to="/editor">
                     <Button type="primary"
                             size="large"
                             icon="addfile"

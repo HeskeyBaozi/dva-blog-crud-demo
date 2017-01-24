@@ -33,8 +33,11 @@ function PostItem({
                 <span>
                     <Link to={`/posts/${record.post_id}`}>
                         <h3>{record.title}</h3>
-                        <p>By <em>{record.author.username}</em> | {moment(record.created_at).fromNow()}</p>
-                </Link>
+                    </Link>
+                    <p>By <Link to={`/user/${record.author.user_id}`}>
+                            <em className={styles.toUser}>{record.author.username}</em>
+                        </Link> | {moment(record.created_at).fromNow()}</p>
+
                 </span>
                 <Link to={`/posts/${record.post_id}`}>
                     <div className={styles.tagGroup}>

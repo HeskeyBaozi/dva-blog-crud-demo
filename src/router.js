@@ -43,20 +43,50 @@ function RouterConfig({history, app}) {
         }
     }
 
+    function requireProfilePrepared(nextState, replace, callback) {
+        const user_id = nextState.params.user_id;
+        if (user_id) {
+            app._store.dispatch({
+                type: 'profile/initializeProfile',
+                payload: {user_id},
+                onComplete: callback
+            });
+        } else {
+            replace('/posts');
+            callback();
+        }
+    }
+
     return (
         <Router history={history}>
             <Route path="/login" component={Login}/>
             <Route path="/register" component={Register}/>
-            <Route path="/" breadcrumbName="Home" component={App} onEnter={requireAuth}>
+            <Route path="/" breadcrumbName="Home" icon="home" component={App} onEnter={requireAuth}>
                 <IndexRedirect to="posts"/>
-                <Route path="posts" breadcrumbName="Posts" component={PostsListPage}/>
-                <Route path="posts/:post_id" breadcrumbName="Post Detail" onEnter={requirePostPrepared}
+                <Route path="posts"
+                       breadcrumbName="Posts"
+                       icon="file-text"
+                       component={PostsListPage}/>
+                <Route path="posts/:post_id"
+                       breadcrumbName="Post Detail"
+                       icon="file-text"
+                       onEnter={requirePostPrepared}
                        component={PostPage}/>
-                <Route path="editor" breadcrumbName="Editor - Create Post" component={PostEditor}
+                <Route path="editor"
+                       breadcrumbName="Editor - Create Post"
+                       icon="plus-square-o"
+                       component={PostEditor}
                        onEnter={requireEditorPrepared}/>
-                <Route path="editor/:post_id" breadcrumbName="Editor - Edit Post" component={PostEditor}
+                <Route path="editor/:post_id"
+                       breadcrumbName="Editor - Edit Post"
+                       icon="edit"
+                       component={PostEditor}
                        onEnter={requireEditorPrepared}/>
-                <Route path="user" breadcrumbName="User Detail" component={UserPage}/>
+                <Route path="user/:user_id"
+                       breadcrumbName="User Detail"
+                       icon="solution"
+                       onEnter={requireProfilePrepared}
+                       component={UserPage}/>
             </Route>
             <Route path="*" breadcrumbName="Not Found" component={props => <h1>Oops! Not Found</h1>}/>
         </Router>

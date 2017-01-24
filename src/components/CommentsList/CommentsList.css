@@ -6,7 +6,10 @@
     float: left;
 }
 
-
 .content {
     margin: 5px 0;
+}
+
+.toUser {
+    text-decoration: underline;
 }

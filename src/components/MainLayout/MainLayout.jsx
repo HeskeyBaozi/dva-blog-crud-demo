@@ -28,7 +28,7 @@ const MainLayout = ({
                             </Link>
                         </Menu.Item>
                         <Menu.Item key="2">
-                            <Link to="/user">
+                            <Link to={`/user/${account.user_id}`}>
                                 <Icon type="user" className={styles.icon}/>User
                             </Link>
                         </Menu.Item>
@@ -38,7 +38,19 @@ const MainLayout = ({
             <Content className={styles.content}>
                 <div className={styles.mainContainer}>
                     <div className={styles.mainContent}>
-                        <Breadcrumb routes={routes} params={params} className={styles.breadcrumb}/>
+                        <Breadcrumb
+                            routes={routes}
+                            params={params}
+                            itemRender={(route, params, routes, paths) => {
+                                const last = routes.indexOf(route) === routes.length - 1;
+                                return last
+                                    ? <span>
+                                        <Icon type={route.icon} className={styles.icon}/>{route.breadcrumbName}</span>
+                                    : <Link to={paths.join('/')}>
+                                        <Icon type={route.icon} className={styles.icon}/>{route.breadcrumbName}
+                                    </Link>
+                            }}
+                            className={styles.breadcrumb}/>
                         {children}
                     </div>
                 </div>

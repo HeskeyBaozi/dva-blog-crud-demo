@@ -60,7 +60,8 @@ function PostPage({
                     }
                 </div>
                 <h1 className={styles.title}>{title}</h1>
-                <p className={styles.leading}>By <em>{author.username}</em>, {moment(created_at).fromNow()}</p>
+                <p className={styles.leading}>By <Link
+                    to={`/user/${author.user_id}`}><em className={styles.toUser}>{author.username}</em></Link>, {moment(created_at).fromNow()}</p>
             </div>
             <PostContent
                 loading={loading.content || loading.setVisible}

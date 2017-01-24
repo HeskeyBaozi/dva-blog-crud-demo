@@ -24,3 +24,7 @@
 .tagGroup {
     margin-left: 12px;
 }
+
+.toUser {
+    text-decoration: underline;
+}

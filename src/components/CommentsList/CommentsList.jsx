@@ -1,4 +1,5 @@
 import React, {PropTypes} from 'react';
+import {Link} from 'dva/router';
 import {Table, Icon, Alert} from 'antd';
 import Publish from '../CommentsPublish/CommentsPublish';
 import styles from './CommentsList.css';
@@ -59,7 +60,8 @@ function CommentsList({
                         }
                     </div>
                     <p className={styles.meta}>
-                        by <em>{record.author.username}</em>, {moment(record.created_at).fromNow()}
+                        by <Link
+                        to={`/user/${record.author.user_id}`}><em className={styles.toUser}>{record.author.username}</em></Link>, {moment(record.created_at).fromNow()}
                     </p>
                     <CommentPanel
                         isSelf={isSelf}
