@@ -40,3 +40,21 @@ $ npm start
     }
 }
 ```
+
+- 终端在正常打开后如下显示，并且会自动打开浏览器标签访问 [http://localhost:8000](http://localhost:8000)
+
+![compile](./readme_img/compile.png)
+
+- 内置一个管理员
+
+username: `admin` password: `admin`
+
+- 内置两个普通用户
+
+username: `hezhiyu` password: `hezhiyu`
+
+username: `normal` password: `normal`
+
+## 数据设计
+
+coming...
