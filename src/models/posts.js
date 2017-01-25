@@ -23,12 +23,7 @@ export default {
                 if (pathToRegExp('/posts').exec(location.pathname)) {
                     dispatch({
                         type: 'fetchPostsList',
-                        payload: {
-                            pageInfo: {
-                                limit: 5,
-                                page: 1
-                            }
-                        }
+                        payload: {pageInfo: {limit: 5, page: 1}}
                     });
                 }
             });

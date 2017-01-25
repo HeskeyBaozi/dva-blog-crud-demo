@@ -21,6 +21,18 @@ $ git clone https://github.com/HeskeyBaozi/dva-blog-crud-demo.git
 $ npm install
 ```
 
+- 开启后端服务器
+[RESTful-blog-server-demo](https://github.com/HeskeyBaozi/RESTful-blog-server-demo)
+
+在这个项目根目录下
+
+```bash
+$ npm install  // 安装服务端依赖
+$ npm run db  // 开启mongoDB 默认路径为./data
+$ npm start
+```
+此时服务器会在`5858`端口开启
+
 - 在保证后端服务器开启情况下
 ```bash
 $ npm start
@@ -61,7 +73,9 @@ username: `normal` password: `normal`
 
 ![flow](./readme_img/log-flow.png)
 
-`models/app`负责全局的登录状态管理。在路由控制中，使用`react-router`的`onEnter`钩子保证在进入需要授权的页面中登录状态是保持的。
+`models/app`负责全局的登录状态管理。
+
+在路由控制中，使用`react-router`的`onEnter`钩子保证在进入需要授权的页面中登录状态是保持的。
 ```javascript
 function requireAuth(nextState, replace, callback) {
     app._store.dispatch({
@@ -76,4 +90,85 @@ function* enterAuth({payload, onComplete}, {put, take}) {
     yield [take('app/hasToken'), take('app/queryUserSuccess')]; // promise the logged state
     onComplete();
 }
+```
+
+### 总体思想
+
+所有的组件都尽量是`stateless`, 所有的状态`connect`组件一般都是路由组件。所有的分发`dispatch`都交给了路由组件来完成。
+
+这样我可以保证我可以复用一些`Dumb`组件，比如`PostsListBody`这个组件，既可以在文章列表页面使用，也可以在用户页面查看自己的文章列表使用。
+
+#### 数据的获取
+
+有两种方式。
+
+一种是`dva.js`官方推荐的, 使用在`models/posts`
+
+"订阅"数据源。这封装了[react-redux-router](https://github.com/reactjs/react-router-redux)增强的`history`。
+
+这样可以监听路由的变化，比如说下面在进入`/posts`时，会发起一个获取文章列表的`action`.
+
+```javascript
+app.model({
+    subscriptions: {
+        setup: function ({history, dispatch}) {
+            history.listen(location => {
+                if (pathToRegExp('/posts').exec(location.pathname)) {
+                    dispatch({
+                        type: 'fetchPostsList',
+                        payload: {pageInfo: {limit: 5, page: 1}}
+                    });
+                }
+            });
+        }
+    }
+});
+```
+
+还有一种是进入一些页面时，要保证一些数据已经在`state`中了。这时我还是使用了`react-router`的`onEnter`钩子。
+
+比如说在进入文章详细页面时，需要知道文章的基本元信息，标题作者等等。等到元信息加载完，再进入页面。
+
+语法层面上上，多亏了有`saga`的各种`effects`创建器。可以很爽地写出各种异步代码
+
+```javascript
+function requirePostPrepared(nextState, replace, callback) {
+    app._store.dispatch({
+        type: 'post_detail/initializePostDetail',
+        payload: {post_id: nextState.params.post_id},
+        onComplete: callback
+    });
+}
+
+function* initializePostDetail({payload, onComplete}, {put, call}) {
+    yield put({type: 'clear'});
+    const {post_id} = payload;
+    const {data} = yield call(fetchPostInfo, {post_id});
+    if (data) {
+        yield put({
+            type: 'saveInitialPostDetailInfo',
+            payload: {postInfo: data}
+        });
+        onComplete(); // enter the component
+        
+        // then fetch the data
+        yield [
+            put({type: 'fetchPostContent'}),
+            put({type: 'fetchPostComments'})
+        ];
+    }
+}
+```
+
+### 文章列表
+
+使用`normalizr`将获取到的文章数组扁平化，方便后续修改`visible`可见状态等。
+
+原理如图：
+
+![normalizr](./readme_img/normalized.png)
+
+这样在获取数据源展示数据时，即可使用一条语句
+```javascript
+const dataSource = postsList.map(post_id => postsById[post_id]).filter(post => post);
 ```
