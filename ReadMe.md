@@ -26,7 +26,7 @@ $ npm install
 $ npm start
 ```
 
-- 其中代理设置为, 将所有`/api`请求代理到后端`API`, 这里后端监听端口为`5858`
+- 其中代理设置如下 (此设置将所有`/api`请求代理到后端`API`, 这里后端监听端口为`5858`)
 ```json
 {
   "proxy": {
@@ -57,4 +57,23 @@ username: `normal` password: `normal`
 
 ## 数据设计
 
-coming...
+### 登录流
+
+![flow](./readme_img/log-flow.png)
+
+`models/app`负责全局的登录状态管理。在路由控制中，使用`react-router`的`onEnter`钩子保证在进入需要授权的页面中登录状态是保持的。
+```javascript
+function requireAuth(nextState, replace, callback) {
+    app._store.dispatch({
+        type: 'app/enterAuth',
+        payload: {},
+        onComplete: callback // enter the component
+    });
+}
+
+function* enterAuth({payload, onComplete}, {put, take}) {
+    yield [put({type: 'checkToken'}), put({type: 'queryUser'})];
+    yield [take('app/hasToken'), take('app/queryUserSuccess')]; // promise the logged state
+    onComplete();
+}
+```
